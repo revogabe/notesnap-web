@@ -18,24 +18,30 @@ import { usePathname } from "next/navigation"
 import { QRCodeSVG } from "qrcode.react"
 import { toast } from "sonner"
 import { updateUserNote } from "@/services/note.service"
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 
 type NoteToolsProps = {
   noteId: string
   defaultVisibility?: "public" | "private"
+  collaborators?: { name: string; avatar?: string | null }[]
 }
 
 const host = process.env.NEXT_PUBLIC_HOST
 const port = process.env.NEXT_PUBLIC_PORT
 
-export const NoteTools = ({ noteId, defaultVisibility }: NoteToolsProps) => {
+const Emojis = ["🍎", "🍇", "🍉", "🍓", "🍑", "🍍", "🥭", "🥑", "🍅", "🥥"]
+
+export const NoteTools = ({
+  noteId,
+  defaultVisibility,
+  collaborators,
+}: NoteToolsProps) => {
   const pathname = usePathname()
   const [visibility, setVisibility] = React.useState(defaultVisibility)
   const [qrUrl, setQrUrl] = React.useState("")
 
   useEffect(() => {
-    if (noteId) {
-      setQrUrl(`${host}${port ? `:${port}` : ""}/companion/${noteId}`)
-    }
+    if (noteId) setQrUrl(`${host}${port ? `:${port}` : ""}/companion/${noteId}`)
   }, [noteId])
 
   const handleQrCodeLink = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -66,22 +72,24 @@ export const NoteTools = ({ noteId, defaultVisibility }: NoteToolsProps) => {
   return (
     <div className="rounded-full bg-secondary absolute top-5 right-5 py-2 border border-border ring-4 ring-muted/50 z-50 px-3 gap-2 flex items-center justify-center">
       {/* Avatar Group */}
-      <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale h-max">
-        <Avatar className="size-6">
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <Avatar className="size-6">
-          <AvatarImage src="https://github.com/leerob.png" alt="@leerob" />
-          <AvatarFallback>LR</AvatarFallback>
-        </Avatar>
-        <Avatar className="size-6">
-          <AvatarImage
-            src="https://github.com/evilrabbit.png"
-            alt="@evilrabbit"
-          />
-          <AvatarFallback>ER</AvatarFallback>
-        </Avatar>
+      <div className="flex -space-x-2  h-max">
+        {collaborators &&
+          collaborators.map((c, idx) => (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Avatar
+                  key={idx}
+                  className="size-6 cursor-default hover:scale-[1.10] duration-200 ease-out ring-2 ring-background"
+                >
+                  <AvatarImage src={c.avatar ?? ""} alt={c.name ?? "User"} />
+                  <AvatarFallback>{Emojis[idx % Emojis.length]}</AvatarFallback>
+                </Avatar>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{c.name}</p>
+              </TooltipContent>
+            </Tooltip>
+          ))}
       </div>
 
       {!pathname.includes("/collaborator") && (

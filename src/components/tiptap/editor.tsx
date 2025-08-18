@@ -6,7 +6,12 @@ import StarterKit from "@tiptap/starter-kit"
 
 import { EditorContent, useEditor } from "@tiptap/react"
 import { BubbleMenu } from "@tiptap/react/menus"
-import { Dropcursor, Placeholder, Selection } from "@tiptap/extensions"
+import {
+  CharacterCount,
+  Dropcursor,
+  Placeholder,
+  Selection,
+} from "@tiptap/extensions"
 import Image from "@tiptap/extension-image"
 import TextAlign from "@tiptap/extension-text-align"
 import { TaskItem, TaskList } from "@tiptap/extension-list"
@@ -14,25 +19,62 @@ import Highlight from "@tiptap/extension-highlight"
 import Typography from "@tiptap/extension-typography"
 import Superscript from "@tiptap/extension-superscript"
 import Subscript from "@tiptap/extension-subscript"
+import Document from "@tiptap/extension-document"
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
 import { updateUserNote } from "@/services/note.service"
 import { toast } from "sonner"
 
+import Collaboration from "@tiptap/extension-collaboration"
+import CollaborationCaret from "@tiptap/extension-collaboration-caret"
+import { CollabEditor } from "@/types"
+
 type NoteEditorProps = {
   noteId: string
   content?: string
+  userName?: string
   onImageReceived?: (editor: ReturnType<typeof useEditor>) => void
 }
 
 export const NoteEditor = ({
   noteId,
   content,
+  userName,
   onImageReceived,
-}: NoteEditorProps) => {
+  provider,
+  document,
+  room,
+}: NoteEditorProps & CollabEditor) => {
   const lastContentRef = React.useRef<string | null>(null)
   const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null)
 
   const initialContent = content ? JSON.parse(content) : ""
+
+  const extensions = [
+    StarterKit.configure({
+      horizontalRule: false,
+      link: { openOnClick: false, enableClickSelection: true },
+    }),
+    TextAlign.configure({ types: ["heading", "paragraph"] }),
+    TaskList,
+    TaskItem.configure({ nested: true }),
+    Highlight.configure({ multicolor: true }),
+    Image,
+    Typography,
+    Superscript,
+    Subscript,
+    Selection,
+    Document,
+    CharacterCount.extend().configure({ limit: 10000 }),
+    Placeholder.configure({ placeholder: "Write something..." }),
+    Dropcursor,
+  ]
+
+  if (document && provider) {
+    extensions.push(
+      Collaboration.configure({ document }),
+      CollaborationCaret.configure({ provider })
+    )
+  }
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -46,28 +88,7 @@ export const NoteEditor = ({
         class: "w-full outline-none mx-auto max-w-[720px] py-24",
       },
     },
-    extensions: [
-      StarterKit.configure({
-        horizontalRule: false,
-        link: {
-          openOnClick: false,
-          enableClickSelection: true,
-        },
-      }),
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-      TaskList,
-      TaskItem.configure({ nested: true }),
-      Highlight.configure({ multicolor: true }),
-      Image,
-      Typography,
-      Superscript,
-      Subscript,
-      Selection,
-      Placeholder.configure({
-        placeholder: "Write something...",
-      }),
-      Dropcursor,
-    ],
+    extensions,
     content: initialContent,
     onUpdate: ({ editor }) => {
       const contentJSON = editor.getJSON()
@@ -86,7 +107,15 @@ export const NoteEditor = ({
         }
       }, 1000)
     },
+    onContentError: ({ disableCollaboration }) => {
+      disableCollaboration()
+    },
   })
+
+  React.useEffect(() => {
+    if (!userName || !editor) return
+    editor.chain().focus().updateUser({ name: userName }).run()
+  }, [editor, userName])
 
   React.useEffect(() => {
     if (editor && onImageReceived) onImageReceived(editor)
@@ -123,6 +152,8 @@ export const NoteEditor = ({
           </ToggleGroup>
         </BubbleMenu>
       )}
+
+      <h1 className="text-xl absolute top-5 left-5">{room}</h1>
 
       <EditorContent editor={editor} />
     </>

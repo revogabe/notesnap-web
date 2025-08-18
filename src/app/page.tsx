@@ -1,3 +1,5 @@
-export function Home() {
-  return <div>Teste</div>
+import { redirect } from "next/navigation"
+
+export default function Home() {
+  redirect("/notes")
 }

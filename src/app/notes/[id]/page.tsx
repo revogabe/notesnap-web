@@ -23,7 +23,7 @@ export default async function NotePage({
 
   return (
     <main className="w-full flex h-screen items-start justify-between overflow-hidden bg-secondary p-5">
-      <aside className="w-full max-w-[300px] mr-4">
+      {/* <aside className="w-full max-w-[300px] mr-4">
         <div
           className={cn(
             "flex gap-3 items-center justify-start w-full px-2.5 py-2.5",
@@ -72,13 +72,21 @@ export default async function NotePage({
             ))}
           </div>
         </ScrollArea>
-      </aside>
+      </aside> */}
 
-      <EditorBox {...note} />
+      {"_id" in note ? (
+        <EditorBox {...note} />
+      ) : (
+        <div className="flex flex-1 items-center justify-center">
+          <TypographyH4>
+            {"message" in note ? note.message : "Note not found."}
+          </TypographyH4>
+        </div>
+      )}
 
-      <div className="h-full w-full max-w-[500px] bg-background rounded-3xl ring-8 ring-border/15 border border-border ml-8">
+      {/* <div className="h-full w-full max-w-[500px] bg-background rounded-3xl ring-8 ring-border/15 border border-border ml-8">
         <ScrollArea className="p-4">right</ScrollArea>
-      </div>
+      </div> */}
     </main>
   )
 }

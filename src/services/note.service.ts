@@ -75,7 +75,7 @@ export async function getUserNoteById(noteId: string) {
 
   if (note.companion?.visibility === "private") {
     if (!session || session.user.id !== String(note.userId)) {
-      throw new Error("Unauthorized")
+      return { message: "You do not have access to this note." }
     }
   }
 
@@ -85,9 +85,6 @@ export async function getUserNoteById(noteId: string) {
     note.companion.emailAllow.length > 0
   ) {
     if (!session) throw new Error("Unauthorized")
-    if (!note.companion.emailAllow.includes(session.user.email)) {
-      throw new Error("Not allowed for this email")
-    }
   }
 
   return note
