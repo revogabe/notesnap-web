@@ -1,13 +1,14 @@
-export type Notes = {
-  id: string
-  title: string
-  content: string
-  tags: string[]
-  images: string[]
-  companion: {
-    visibility: "private" | "public"
-    email_allow: string[]
-  }
-  created_at: string
-  updated_at: string
-}
+import { INote } from "@/models/note.model"
+
+export type Note = Pick<
+  INote,
+  | "_id"
+  | "title"
+  | "content"
+  | "tags"
+  | "images"
+  | "userId"
+  | "companion"
+  | "createdAt"
+  | "updatedAt"
+>

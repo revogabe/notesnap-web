@@ -1,6 +1,6 @@
-import type { Notes } from "@/types"
+import type { Note } from "@/types"
 
-export const NOTES: Notes[] = [
+export const NOTES: Note[] = [
   {
     id: "1",
     title: "Super secret passwords",

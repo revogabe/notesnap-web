@@ -120,7 +120,7 @@
     outline-color: theme("colors.ring / 0.5");
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-secondary text-foreground font-sans;
   }
 
   .tiptap {
