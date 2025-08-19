@@ -5,12 +5,14 @@ import { NoteTools } from "../notes/note-tools"
 import { NoteEditor } from "./editor"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
-import { CollabEditor, Note } from "@/types"
+import { Note } from "@/types"
 
 import * as Y from "yjs"
 import { TiptapCollabProvider } from "@tiptap-pro/provider"
 import { useEditor } from "@tiptap/react"
 import { authClient } from "@/lib/auth-client"
+import { updateUserNote } from "@/services/note.service"
+import { useRouter } from "next/navigation"
 
 const appId = "y9w5jrp9"
 
@@ -30,6 +32,32 @@ export const EditorBox = (note: Note) => {
   const [provider, setProvider] = useState<TiptapCollabProvider | null>(null)
   const [document, setDocument] = useState<Y.Doc | null>(null)
 
+  const [visibility, setVisibility] = useState<"public" | "private">(
+    note.companion?.visibility || "private"
+  )
+
+  const handleVisibilityChange = async (
+    newVisibility: "public" | "private"
+  ) => {
+    await updateUserNote({
+      _id: noteId,
+      companion: {
+        visibility: newVisibility,
+      },
+    })
+    setVisibility(newVisibility)
+
+    if (newVisibility === "private" && provider && editorInstance) {
+      provider.destroy()
+      editorInstance.destroy()
+      setProvider(null)
+      setCollaborators([])
+      return
+    }
+
+    if (newVisibility === "public") window.location.reload()
+  }
+
   useEffect(() => {
     authClient.getSession().then((result) => {
       if ("data" in result && result.data?.user) {
@@ -46,44 +74,64 @@ export const EditorBox = (note: Note) => {
   useEffect(() => {
     if (note.companion?.visibility === "private") return
 
-    const doc = new Y.Doc()
-    const prov = new TiptapCollabProvider({
-      appId,
-      name: `note:${noteId}`,
-      document: doc,
-      token:
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTU1MzY3NDEsIm5iZiI6MTc1NTUzNjc0MSwiZXhwIjoxNzU1NjIzMTQxLCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ5OXc1anJwOSJ9.fLX1cLi3JR47zD4yOfxK0lsIbBuiHK8hjo-PaIkXU14",
-    })
+    let cancelled = false
+    let doc: Y.Doc | null = null
+    let prov: TiptapCollabProvider | null = null
 
-    if (prov.awareness && user) {
-      prov.awareness.setLocalStateField("user", {
-        name: user.name,
-        avatar: user.avatar,
-      })
+    // Lazy load provider/document
+    const loadProvider = async () => {
+      try {
+        doc = new Y.Doc()
+        prov = new TiptapCollabProvider({
+          appId,
+          name: `note:${noteId}`,
+          document: doc,
+          token:
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTU1MzY3NDEsIm5iZiI6MTc1NTUzNjc0MSwiZXhwIjoxNzU1NjIzMTQxLCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ5OXc1anJwOSJ9.fLX1cLi3JR47zD4yOfxK0lsIbBuiHK8hjo-PaIkXU14",
+        })
+
+        if (prov.awareness && user) {
+          prov.awareness.setLocalStateField("user", {
+            name: user.name,
+            avatar: user.avatar,
+          })
+        }
+
+        if (cancelled) return
+        setDocument(doc)
+        setProvider(prov)
+
+        const updateUsers = () => {
+          const states = prov!.awareness
+            ? Array.from(prov!.awareness.getStates().values())
+            : []
+          const users = states.map((s: any) => s.user).filter(Boolean)
+          setCollaborators(users)
+        }
+
+        if (prov.awareness) {
+          prov.awareness.on("change", updateUsers)
+        }
+        updateUsers()
+      } catch (err) {
+        // Silencie erro de conexão websocket
+        setProvider(null)
+        setDocument(null)
+        setCollaborators([])
+      }
     }
 
-    setDocument(doc)
-    setProvider(prov)
-
-    const updateUsers = () => {
-      const states = prov.awareness
-        ? Array.from(prov.awareness.getStates().values())
-        : []
-      const users = states.map((s: any) => s.user).filter(Boolean)
-      setCollaborators(users)
-    }
-
-    if (prov.awareness) {
-      prov.awareness.on("change", updateUsers)
-    }
-    updateUsers()
+    // Lazy load após pequeno delay para evitar erro imediato
+    const timeout = setTimeout(loadProvider, 500)
 
     return () => {
-      if (prov.awareness) prov.awareness.off("change", updateUsers)
-      prov.destroy()
-      doc.destroy()
+      cancelled = true
+      clearTimeout(timeout)
+      if (prov && prov.awareness) prov.awareness.off("change", () => {})
+      if (prov) prov.destroy()
+      if (doc) doc.destroy()
     }
-  }, [noteId, note.companion?.visibility])
+  }, [noteId, note.companion?.visibility, user])
 
   useEffect(() => {
     if (!editorInstance) return
@@ -118,26 +166,28 @@ export const EditorBox = (note: Note) => {
     <ScrollArea className="h-full w-full flex-1 bg-background rounded-3xl ring-8 ring-border/15 border border-border overflow-hidden px-12">
       <NoteTools
         noteId={noteId}
-        defaultVisibility={note.companion?.visibility}
+        visibility={visibility}
+        onVisibilityChange={handleVisibilityChange}
         collaborators={collaborators}
       />
-      {note.companion?.visibility === "private" ? (
+      {visibility === "private" ? (
         <NoteEditor
           note={note}
           onImageReceived={(editor) => setEditorInstance(editor)}
         />
+      ) : provider && document ? (
+        <NoteEditor
+          note={note}
+          userName={user?.name}
+          onImageReceived={(editor) => setEditorInstance(editor)}
+          provider={provider}
+          room={`note:${noteId}`}
+          document={document}
+        />
       ) : (
-        provider &&
-        document && (
-          <NoteEditor
-            note={note}
-            userName={user?.name}
-            onImageReceived={(editor) => setEditorInstance(editor)}
-            provider={provider}
-            room={`note:${noteId}`}
-            document={document}
-          />
-        )
+        <div className="flex items-center justify-center w-full py-32 text-muted-foreground">
+          <p>No document available for editing.</p>
+        </div>
       )}
     </ScrollArea>
   )

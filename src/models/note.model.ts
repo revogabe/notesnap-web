@@ -2,7 +2,6 @@ import mongoose, { Schema, model, Types, Document } from "mongoose"
 
 export interface ICompanion {
   visibility: "private" | "public"
-  emailAllow: string[]
 }
 
 export interface INote extends Document {
@@ -18,7 +17,6 @@ export interface INote extends Document {
 
 const CompanionSchema = new Schema<ICompanion>({
   visibility: { type: String, enum: ["private", "public"], required: true },
-  emailAllow: { type: [String], default: [] },
 })
 
 const NoteSchema = new Schema<INote>({

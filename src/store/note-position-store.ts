@@ -16,7 +16,7 @@ interface NotesPositionState {
 
 export const useNotesPositionStore = create<NotesPositionState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       positions: [],
 
       setPosition: (id, x, y) =>
@@ -40,8 +40,8 @@ export const useNotesPositionStore = create<NotesPositionState>()(
             .filter((note) => !existingIds.has(String(note._id)))
             .map((note, idx) => ({
               id: String(note._id),
-              x: 90 * (state.positions.length + idx),
-              y: 90 * (state.positions.length + idx),
+              x: 50 * (state.positions.length + idx),
+              y: 50 * (state.positions.length + idx),
             }))
 
           // mantém as antigas e adiciona só as novas

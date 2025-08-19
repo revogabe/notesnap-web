@@ -17,13 +17,12 @@ import {
 import { usePathname } from "next/navigation"
 import { QRCodeSVG } from "qrcode.react"
 import { toast } from "sonner"
-import { updateUserNote } from "@/services/note.service"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
-import { CollabEditor } from "@/types"
 
 type NoteToolsProps = {
   noteId: string
-  defaultVisibility?: "public" | "private"
+  visibility: "public" | "private"
+  onVisibilityChange: (visibility: "public" | "private") => void
   collaborators?: { name: string; avatar?: string | null }[]
 }
 
@@ -34,11 +33,12 @@ const Emojis = ["🍎", "🍇", "🍉", "🍓", "🍑", "🍍", "🥭", "🥑", 
 
 export const NoteTools = ({
   noteId,
-  defaultVisibility,
+  visibility,
+  onVisibilityChange,
   collaborators,
 }: NoteToolsProps) => {
   const pathname = usePathname()
-  const [visibility, setVisibility] = React.useState(defaultVisibility)
+
   const [qrUrl, setQrUrl] = React.useState("")
 
   useEffect(() => {
@@ -59,28 +59,19 @@ export const NoteTools = ({
     toast("Link copied to clipboard!")
   }
 
-  const handleToogleVisibility = async (visibility: "public" | "private") => {
-    await updateUserNote({
-      _id: noteId,
-      companion: {
-        visibility,
-        emailAllow: [],
-      },
-    })
-
-    setVisibility(visibility)
-  }
-
   return (
     <div className="rounded-full bg-secondary absolute top-5 right-5 py-2 border border-border ring-4 ring-muted/50 z-50 px-3 gap-2 flex items-center justify-center">
       {/* Avatar Group */}
-      <div className="flex -space-x-2  h-max">
-        {collaborators &&
-          collaborators.map((c, idx) => (
+      {collaborators && collaborators?.length > 0 && (
+        <div className="flex -space-x-2  h-max">
+          {collaborators.map((c, idx) => (
             <Tooltip key={idx}>
               <TooltipTrigger asChild>
                 <Avatar className="size-6 cursor-default hover:scale-[1.10] duration-200 ease-out ring-2 ring-background">
-                  <AvatarImage src={c.avatar ?? ""} alt={c.name ?? "User"} />
+                  <AvatarImage
+                    src={c.avatar || undefined}
+                    alt={c.name ?? "User"}
+                  />
                   <AvatarFallback>{Emojis[idx % Emojis.length]}</AvatarFallback>
                 </Avatar>
               </TooltipTrigger>
@@ -89,7 +80,8 @@ export const NoteTools = ({
               </TooltipContent>
             </Tooltip>
           ))}
-      </div>
+        </div>
+      )}
 
       {pathname && !pathname.includes("/collaborator") && (
         <Popover>
@@ -115,7 +107,7 @@ export const NoteTools = ({
                 <Select
                   value={visibility}
                   onValueChange={(value) =>
-                    handleToogleVisibility(value as "public" | "private")
+                    onVisibilityChange(value as "public" | "private")
                   }
                 >
                   <SelectTrigger className="w-full max-w-[180px] rounded-xl">
