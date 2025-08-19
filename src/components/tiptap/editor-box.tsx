@@ -14,8 +14,8 @@ import { authClient } from "@/lib/auth-client"
 
 const appId = "y9w5jrp9"
 
-export const EditorBox = ({ _id, content, companion }: Note) => {
-  const noteId = String(_id)
+export const EditorBox = (note: Note) => {
+  const noteId = String(note._id)
   const [editorInstance, setEditorInstance] =
     useState<ReturnType<typeof useEditor>>()
 
@@ -44,7 +44,7 @@ export const EditorBox = ({ _id, content, companion }: Note) => {
   }, [])
 
   useEffect(() => {
-    if (companion?.visibility === "private") return
+    if (note.companion?.visibility === "private") return
 
     const doc = new Y.Doc()
     const prov = new TiptapCollabProvider({
@@ -69,9 +69,7 @@ export const EditorBox = ({ _id, content, companion }: Note) => {
       const states = prov.awareness
         ? Array.from(prov.awareness.getStates().values())
         : []
-      const users = states
-        .map((s: any) => s.user) // aqui pegamos o campo `user` do awareness
-        .filter(Boolean)
+      const users = states.map((s: any) => s.user).filter(Boolean)
       setCollaborators(users)
     }
 
@@ -85,7 +83,7 @@ export const EditorBox = ({ _id, content, companion }: Note) => {
       prov.destroy()
       doc.destroy()
     }
-  }, [noteId, companion?.visibility])
+  }, [noteId, note.companion?.visibility])
 
   useEffect(() => {
     if (!editorInstance) return
@@ -114,27 +112,25 @@ export const EditorBox = ({ _id, content, companion }: Note) => {
     return () => {
       channel.unsubscribe()
     }
-  }, [editorInstance, _id])
+  }, [editorInstance, noteId])
 
   return (
-    <ScrollArea className="h-full w-full flex-1 bg-background rounded-3xl ring-8 ring-border/15 border border-border overflow-hidden">
+    <ScrollArea className="h-full w-full flex-1 bg-background rounded-3xl ring-8 ring-border/15 border border-border overflow-hidden px-12">
       <NoteTools
         noteId={noteId}
-        defaultVisibility={companion?.visibility}
+        defaultVisibility={note.companion?.visibility}
         collaborators={collaborators}
       />
-      {companion?.visibility === "private" ? (
+      {note.companion?.visibility === "private" ? (
         <NoteEditor
-          noteId={noteId}
-          content={content}
+          note={note}
           onImageReceived={(editor) => setEditorInstance(editor)}
         />
       ) : (
         provider &&
         document && (
           <NoteEditor
-            noteId={noteId}
-            content={content}
+            note={note}
             userName={user?.name}
             onImageReceived={(editor) => setEditorInstance(editor)}
             provider={provider}

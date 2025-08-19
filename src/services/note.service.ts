@@ -12,19 +12,19 @@ import {
 import { revalidatePath } from "next/cache"
 import { Note } from "@/types"
 
-export async function createUserNote() {
+export async function createUserNote(title?: string) {
   // if user is not authenticated
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error("Unauthorized")
 
   const userId = session.user.id
   const userEmail = session.user.email
-  const note = await createNewNote(userId, userEmail)
+  const note = await createNewNote(userId, userEmail, title)
 
   if (!note) throw new Error("Failed to create note")
 
   revalidatePath(`/notes`)
-  return { id: note.id }
+  return note as Note
 }
 
 export async function updateUserNote(note: Partial<Note> & { _id: string }) {
@@ -36,7 +36,7 @@ export async function updateUserNote(note: Partial<Note> & { _id: string }) {
 
   if (!result) throw new Error("Failed to update note")
 
-  revalidatePath(`/notes/${note._id}`)
+  revalidatePath(`/notes`)
   return { message: "Note updated successfully" }
 }
 
@@ -88,4 +88,11 @@ export async function getUserNoteById(noteId: string) {
   }
 
   return note
+}
+
+export async function getSimpleNoteById(noteId: string) {
+  const note = await findNoteById(noteId)
+  if (!note) throw new Error("Note not found")
+
+  return { _id: note._id, title: note.title } as Pick<Note, "_id" | "title">
 }

@@ -2,17 +2,23 @@ import { NoteModel } from "@/models/note.model"
 import { Note } from "@/types"
 import { serializeMongo } from "@/utils/serializeMongo"
 
-export async function createNewNote(userId: string, userEmail: string) {
-  return NoteModel.create({
-    title: "Untitled Note",
+export async function createNewNote(
+  userId: string,
+  userEmail: string,
+  title?: string
+) {
+  const note = await NoteModel.create({
+    title: title || "Untitled Note",
     tags: [],
     images: [],
     companion: {
-      visibility: "public",
+      visibility: "private",
       emailAllow: [userEmail],
     },
     userId: userId,
   })
+
+  return JSON.parse(JSON.stringify(note)) as Note
 }
 
 export async function updateNote(input: Partial<Note> & { _id: string }) {

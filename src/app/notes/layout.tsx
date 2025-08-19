@@ -21,5 +21,5 @@ export default async function NoteLayout({
     redirect("/sign-in")
   }
 
-  return children
+  return <>{children}</>
 }

@@ -1,11 +1,11 @@
 "use client"
 
 import "@/app/globals.css"
-import React from "react"
+import React, { useState } from "react"
 import StarterKit from "@tiptap/starter-kit"
 
 import { EditorContent, useEditor } from "@tiptap/react"
-import { BubbleMenu } from "@tiptap/react/menus"
+import { BubbleMenu, FloatingMenu } from "@tiptap/react/menus"
 import {
   CharacterCount,
   Dropcursor,
@@ -26,28 +26,37 @@ import { toast } from "sonner"
 
 import Collaboration from "@tiptap/extension-collaboration"
 import CollaborationCaret from "@tiptap/extension-collaboration-caret"
-import { CollabEditor } from "@/types"
+import { CollabEditor, Note } from "@/types"
+import { useNoteStore } from "@/store/note-store"
 
 type NoteEditorProps = {
-  noteId: string
-  content?: string
+  note: Note
   userName?: string
   onImageReceived?: (editor: ReturnType<typeof useEditor>) => void
 }
 
 export const NoteEditor = ({
-  noteId,
-  content,
+  note,
   userName,
   onImageReceived,
   provider,
-  document,
-  room,
+  document: yjsDoc,
 }: NoteEditorProps & CollabEditor) => {
+  const noteId = String(note._id)
+
+  const noteStore = useNoteStore()
+  const storedNote = noteStore.getNote(noteId)
+
+  const [noteTitle, setNoteTitle] = useState(note.title)
+
   const lastContentRef = React.useRef<string | null>(null)
   const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null)
 
-  const initialContent = content ? JSON.parse(content) : ""
+  const initialContent = storedNote?.content
+    ? JSON.parse(storedNote.content)
+    : note.content
+    ? JSON.parse(note.content)
+    : ""
 
   const extensions = [
     StarterKit.configure({
@@ -69,9 +78,9 @@ export const NoteEditor = ({
     Dropcursor,
   ]
 
-  if (document && provider) {
+  if (yjsDoc && provider) {
     extensions.push(
-      Collaboration.configure({ document }),
+      Collaboration.configure({ document: yjsDoc }),
       CollaborationCaret.configure({ provider })
     )
   }
@@ -101,6 +110,12 @@ export const NoteEditor = ({
           try {
             await updateUserNote({ _id: noteId, content: contentString })
             lastContentRef.current = contentString
+            noteStore.setNote({
+              ...note,
+              _id: noteId,
+              title: noteTitle,
+              content: contentString,
+            })
           } catch (err) {
             toast("Failed to update note")
           }
@@ -121,41 +136,153 @@ export const NoteEditor = ({
     if (editor && onImageReceived) onImageReceived(editor)
   }, [editor, onImageReceived])
 
-  const TOOLS = React.useMemo(
-    () => ({
-      bold: {
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value
+    setNoteTitle(newTitle)
+
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
+
+    debounceTimeout.current = setTimeout(async () => {
+      if (lastContentRef.current === newTitle || !newTitle) return
+      await updateUserNote({ _id: noteId, title: newTitle })
+      noteStore.setNote({
+        ...note,
+        _id: noteId,
+        title: newTitle,
+      })
+    }, 500)
+  }
+
+  const TOOLS = React.useMemo(() => {
+    if (!editor) return []
+    return [
+      {
         icon: "B",
-        action: () => editor?.chain().focus().toggleBold().run(),
+        action: () => editor.chain().focus().toggleBold().run(),
+        title: "Bold",
       },
-      italic: {
+      {
         icon: "I",
-        action: () => editor?.chain().focus().toggleItalic().run(),
+        action: () => editor.chain().focus().toggleItalic().run(),
+        title: "Italic",
       },
-      strike: {
+      {
+        icon: "U",
+        action: () => editor.chain().focus().toggleUnderline().run(),
+        title: "Underline",
+      },
+      {
         icon: "S",
-        action: () => editor?.chain().focus().toggleStrike().run(),
+        action: () => editor.chain().focus().toggleStrike().run(),
+        title: "Strike",
       },
-    }),
-    [editor]
-  )
+      {
+        icon: "H",
+        action: () => editor.chain().focus().toggleHighlight().run(),
+        title: "Highlight",
+      },
+      {
+        icon: "•",
+        action: () => editor.chain().focus().toggleBulletList().run(),
+        title: "Bullet List",
+      },
+      {
+        icon: "1.",
+        action: () => editor.chain().focus().toggleOrderedList().run(),
+        title: "Numbered List",
+      },
+      {
+        icon: "❝ ❞",
+        action: () => editor.chain().focus().toggleBlockquote().run(),
+        title: "Blockquote",
+      },
+    ]
+  }, [editor])
+
+  const BLOCK = React.useMemo(() => {
+    if (!editor) return []
+    return [
+      {
+        label: "H1",
+        action: () => editor.chain().focus().setHeading({ level: 1 }).run(),
+      },
+      {
+        label: "H2",
+        action: () => editor.chain().focus().setHeading({ level: 2 }).run(),
+      },
+      {
+        label: "H3",
+        action: () => editor.chain().focus().setHeading({ level: 3 }).run(),
+      },
+      {
+        label: "H4",
+        action: () => editor.chain().focus().setHeading({ level: 4 }).run(),
+      },
+      {
+        label: "H5",
+        action: () => editor.chain().focus().setHeading({ level: 5 }).run(),
+      },
+      {
+        label: "H6",
+        action: () => editor.chain().focus().setHeading({ level: 6 }).run(),
+      },
+      {
+        label: "P",
+        action: () => editor.chain().focus().setParagraph().run(),
+      },
+      {
+        label: "</>",
+        action: () => editor.chain().focus().setCodeBlock().run(),
+      },
+    ]
+  }, [editor])
 
   return (
-    <>
+    <div className="w-full mx-auto max-w-[720px] px-12">
+      <input
+        type="text"
+        value={noteTitle}
+        onChange={handleTitleChange}
+        placeholder="Enter note title..."
+        className="w-full mx-auto text-3xl font-bold border-b border-gray-300 pb-4 -mb-8 pt-16 focus:outline-none line-clamp-1"
+      />
+
       {editor && (
-        <BubbleMenu className="bubble-menu" editor={editor}>
-          <ToggleGroup type="multiple">
-            {Object.entries(TOOLS).map(([key, { icon, action }]) => (
-              <ToggleGroupItem key={key} value={key} onClick={action}>
-                {icon}
+        <BubbleMenu
+          editor={editor}
+          className="bg-background shadow-lg rounded-2xl p-1.5 flex flex-wrap gap-2 items-center border border-border
+               opacity-0 scale-90 transform transition-all duration-200 ease-out
+               animate-bubble-menu"
+        >
+          <ToggleGroup type="single" className="flex gap-1">
+            {BLOCK.map((block) => (
+              <ToggleGroupItem
+                key={block.label}
+                value={block.label}
+                onClick={block.action}
+                className="px-2 py-1 rounded-lg hover:bg-muted cursor-pointer text-muted-foreground font-medium text-sm"
+              >
+                {block.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+
+          <ToggleGroup type="multiple" className="flex gap-1">
+            {TOOLS.map((tool, idx) => (
+              <ToggleGroupItem
+                key={idx}
+                value={tool.title}
+                onClick={tool.action}
+                className="px-2 py-1 rounded-lg hover:bg-muted cursor-pointer text-muted-foreground font-medium text-sm"
+              >
+                {tool.icon}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
         </BubbleMenu>
       )}
 
-      <h1 className="text-xl absolute top-5 left-5">{room}</h1>
-
       <EditorContent editor={editor} />
-    </>
+    </div>
   )
 }

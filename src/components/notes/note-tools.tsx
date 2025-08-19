@@ -19,6 +19,7 @@ import { QRCodeSVG } from "qrcode.react"
 import { toast } from "sonner"
 import { updateUserNote } from "@/services/note.service"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
+import { CollabEditor } from "@/types"
 
 type NoteToolsProps = {
   noteId: string
@@ -59,7 +60,6 @@ export const NoteTools = ({
   }
 
   const handleToogleVisibility = async (visibility: "public" | "private") => {
-    setVisibility(visibility)
     await updateUserNote({
       _id: noteId,
       companion: {
@@ -67,6 +67,8 @@ export const NoteTools = ({
         emailAllow: [],
       },
     })
+
+    setVisibility(visibility)
   }
 
   return (
@@ -75,12 +77,9 @@ export const NoteTools = ({
       <div className="flex -space-x-2  h-max">
         {collaborators &&
           collaborators.map((c, idx) => (
-            <Tooltip>
+            <Tooltip key={idx}>
               <TooltipTrigger asChild>
-                <Avatar
-                  key={idx}
-                  className="size-6 cursor-default hover:scale-[1.10] duration-200 ease-out ring-2 ring-background"
-                >
+                <Avatar className="size-6 cursor-default hover:scale-[1.10] duration-200 ease-out ring-2 ring-background">
                   <AvatarImage src={c.avatar ?? ""} alt={c.name ?? "User"} />
                   <AvatarFallback>{Emojis[idx % Emojis.length]}</AvatarFallback>
                 </Avatar>
@@ -92,7 +91,7 @@ export const NoteTools = ({
           ))}
       </div>
 
-      {!pathname.includes("/collaborator") && (
+      {pathname && !pathname.includes("/collaborator") && (
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="h-8 gap-2 rounded-full">

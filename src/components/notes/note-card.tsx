@@ -30,11 +30,11 @@ import {
   ContextMenuTrigger,
 } from "../ui/context-menu"
 
-import Link from "next/link"
 import { toast } from "sonner"
 import { deleteUserNote, updateUserNote } from "@/services/note.service"
 import { Note } from "@/types"
 import { tipTapToText } from "@/utils/tipTapToText"
+import { motion } from "motion/react"
 
 const host = process.env.NEXT_PUBLIC_HOST
 const port = process.env.NEXT_PUBLIC_PORT
@@ -42,12 +42,14 @@ const port = process.env.NEXT_PUBLIC_PORT
 export const NoteCard = (note: Note) => {
   const handleDeleteNote = async (e: React.MouseEvent) => {
     e.stopPropagation()
+    e.preventDefault()
     if (!note._id) return
     const response = await deleteUserNote(note._id.toString())
     if (response.message) return toast(response.message)
   }
 
   const handleShareLink = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
     e.preventDefault()
     navigator.clipboard.writeText(
       `${host}${port ? `:${port}` : ""}/collaborator/${note._id}`
@@ -69,15 +71,17 @@ export const NoteCard = (note: Note) => {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <Link
-          href={`/notes/${note._id?.toString()}`}
+        <motion.div
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 16 }}
           className={cn(
             "mb-8 break-inside-avoid relative select-none",
-            "flex flex-col p-5 border border-border rounded-4xl md:max-w-[280px] h-max",
-            "hover:opacity-80 duration-200 !transition-all ease-out hover:-translate-y-2 active:scale-[0.98] cursor-pointer bg-background hover:bg-muted",
+            "flex flex-col p-5 border border-border rounded-3xl w-[300px]",
+            "hover:opacity-70 duration-200 !transition-all ease-out active:scale-[0.98] cursor-pointer bg-background hover:bg-muted",
             "shadow-lg shadow-black/5",
             "ring-4 ring-muted",
-            "bg-gradient-to-b from-background to-muted/25"
+            "bg-gradient-to-t from-white to-muted"
           )}
         >
           {note.companion?.visibility === "private" && (
@@ -101,44 +105,48 @@ export const NoteCard = (note: Note) => {
           <TypographyH4 className="text-xl font-bold line-clamp-2">
             {note.title}
           </TypographyH4>
-          <div>
-            {note.companion?.visibility === "private" ? (
-              <TypographyP className="blur-[3px] mt-2 mb-3">
-                There are many variations of passages of Lorem Ipsum available,
-                but the majority have suffered alteration in some form, by
-                injected humour, or randomised words which look even slightly
-                believable.
-              </TypographyP>
-            ) : (
-              <TypographyP
-                className={cn((note.content?.length ?? 0) > 0 && "mt-2 mb-3")}
-              >
-                {tipTapToText(note.content)}
-              </TypographyP>
-            )}
+          <div className="w-full max-h-[310px] overflow-hidden">
+            <TypographyP
+              className={cn((note.content?.length ?? 0) > 0 && "mt-2 mb-3")}
+            >
+              {tipTapToText(note.content)}
+            </TypographyP>
           </div>
+
           <div className="mt-1 flex items-center justify-between w-full">
             <TypographyMuted className="font-semibold">
               {format(note.updatedAt, "PP")}
             </TypographyMuted>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="hover:bg-muted-foreground/25 duration-200 ease-out px-1 h-7 rounded-lg">
+              <DropdownMenuTrigger
+                data-stop-open
+                // impedir que clique no trigger abra o drawer
+                onClick={(e) => e.stopPropagation()}
+                className="hover:bg-muted-foreground/25 duration-200 ease-out px-1 h-7 rounded-lg"
+              >
                 <Ellipsis size={24} className="text-muted-foreground" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="overflow-hidden">
+
+              <DropdownMenuContent className="overflow-hidden" data-stop-open>
                 <DropdownMenuItem
+                  data-stop-open
                   onClick={handleShareLink}
                   disabled={note.companion?.visibility === "private"}
                 >
                   Share Link
                 </DropdownMenuItem>
+
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Visibility</DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
+                  <DropdownMenuSubTrigger data-stop-open>
+                    Visibility
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent data-stop-open>
                     <DropdownMenuCheckboxItem
+                      data-stop-open
                       onClick={(e) => {
                         e.stopPropagation()
+                        e.preventDefault()
                         handleToogleVisibility("public")
                       }}
                       checked={note.companion?.visibility === "public"}
@@ -146,8 +154,10 @@ export const NoteCard = (note: Note) => {
                       Public
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
+                      data-stop-open
                       onClick={(e) => {
                         e.stopPropagation()
+                        e.preventDefault()
                         handleToogleVisibility("private")
                       }}
                       checked={note.companion?.visibility === "private"}
@@ -156,7 +166,9 @@ export const NoteCard = (note: Note) => {
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
+
                 <DropdownMenuItem
+                  data-stop-open
                   onClick={handleDeleteNote}
                   variant="destructive"
                 >
@@ -165,26 +177,48 @@ export const NoteCard = (note: Note) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </Link>
+        </motion.div>
       </ContextMenuTrigger>
-      <ContextMenuContent className="overflow-hidden">
-        <ContextMenuItem>Share Link</ContextMenuItem>
+
+      {/* Context menu (clique direito) - por segurança, também marcamos */}
+      <ContextMenuContent className="overflow-hidden" data-stop-open>
+        <ContextMenuItem data-stop-open onClick={handleShareLink as any}>
+          Share Link
+        </ContextMenuItem>
         <ContextMenuSub>
-          <ContextMenuSubTrigger>Visibility</ContextMenuSubTrigger>
-          <ContextMenuSubContent>
+          <ContextMenuSubTrigger data-stop-open>
+            Visibility
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent data-stop-open>
             <ContextMenuCheckboxItem
+              data-stop-open
+              onClick={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                handleToogleVisibility("public")
+              }}
               checked={note.companion?.visibility === "public"}
             >
               Public
             </ContextMenuCheckboxItem>
             <ContextMenuCheckboxItem
+              data-stop-open
+              onClick={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                handleToogleVisibility("private")
+              }}
               checked={note.companion?.visibility === "private"}
             >
               Private
             </ContextMenuCheckboxItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
-        <ContextMenuItem onClick={handleDeleteNote} variant="destructive">
+        <ContextMenuItem
+          data-stop-open
+          onClick={handleDeleteNote}
+          variant="destructive"
+        >
           Delete
         </ContextMenuItem>
       </ContextMenuContent>
