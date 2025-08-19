@@ -9,10 +9,6 @@ export default async function CompanionPage({
   const { id } = await params
   const note = await getSimpleNoteById(id)
 
-  if (!id) {
-    return <div>Note ID is required</div>
-  }
-
   if (!note) {
     return <div>Note not found</div>
   }

@@ -1,38 +1,35 @@
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   TypographyH4,
   TypographyMuted,
   TypographyP,
 } from "@/components/ui/typography"
-import { cn } from "@/lib/utils"
-import { ChevronDown } from "lucide-react"
-import Link from "next/link"
-import { format } from "date-fns"
-import { EditorBox } from "@/components/tiptap/editor-box"
-import { Note } from "@/types"
-import { DrawerClose } from "../ui/drawer"
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
-} from "../ui/context-menu"
-import { deleteUserNote } from "@/services/note.service"
+} from "@/components/ui/context-menu"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { DrawerClose } from "@/components/ui/drawer"
+
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
+import { format } from "date-fns"
+import { EditorBox } from "@/components/tiptap/editor-box"
+import { ChevronDown } from "lucide-react"
+
+import { Note } from "@/types"
+import { deleteUserNote } from "@/services/note.service"
 import { useDrawerNoteStore } from "@/store/note-drawer"
 
-type NoteContentPageProps = {
+type NoteContentProps = {
   note: Note
   notes: Note[]
   onNoteSelect?: (note: Note) => void
 }
 
-export function NoteContentPage({
-  note,
-  notes,
-  onNoteSelect,
-}: NoteContentPageProps) {
+export function NoteContent({ note, notes, onNoteSelect }: NoteContentProps) {
   const setActiveNote = useDrawerNoteStore((state) => state.setActiveNote)
 
   const handleDeleteNote = async (e: React.MouseEvent, noteId: string) => {
@@ -63,7 +60,7 @@ export function NoteContentPage({
             <TypographyH4 className="font-bold text-base line-clamp-1 font-sans">
               {note.title}
             </TypographyH4>
-            <TypographyMuted classID="text-xs font-sans">
+            <TypographyMuted className="text-xs font-sans">
               {note.updatedAt ? format(note.updatedAt, "PPp") : "Unknown date"}{" "}
               - Saved
             </TypographyMuted>
@@ -72,53 +69,63 @@ export function NoteContentPage({
         <ScrollArea className="h-[calc(100vh-100px)] overflow-y-auto relative pt-4">
           <div className="flex flex-col gap-1">
             {notes.map((n: Note) => (
-              <ContextMenu key={`${n.title}-${n.updatedAt}`}>
-                <ContextMenuTrigger asChild>
-                  <button
-                    onClick={() => onNoteSelect?.(n)}
-                    className={cn(
-                      "flex group flex-col duration-200 ease-out !transition-all items-start justify-center gap-0 w-full border border-transparent bg-transparent hover:bg-muted-foreground/10 rounded-xl px-2.5 py-2",
-                      note._id === n._id &&
-                        "border-background bg-radial-[at_100%_75%] to-transparent from-background shadow shadow-black/5"
-                    )}
-                  >
-                    <TypographyP className="font-semibold font-sans text-foreground line-clamp-1">
-                      {n.title}
-                    </TypographyP>
-                    <TypographyMuted className="text-xs font-sans">
-                      {n.updatedAt
-                        ? format(n.updatedAt, "PPp")
-                        : "Unknown date"}{" "}
-                      - Saved
-                    </TypographyMuted>
-                  </button>
-                </ContextMenuTrigger>
-
-                {/* Context menu (clique direito) - por segurança, também marcamos */}
-                <ContextMenuContent className="overflow-hidden" data-stop-open>
-                  <ContextMenuItem
-                    data-stop-open
-                    onClick={(e) => {
-                      handleDeleteNote(e, String(n._id))
-                    }}
-                    variant="destructive"
-                  >
-                    Delete
-                  </ContextMenuItem>
-                </ContextMenuContent>
-              </ContextMenu>
+              <NoteListCard
+                key={`${n.title}-${n.updatedAt}`}
+                note={n}
+                currentId={String(note._id)}
+                onNoteSelect={onNoteSelect}
+                onDeleteNote={(e) => handleDeleteNote(e, String(n._id))}
+              />
             ))}
           </div>
         </ScrollArea>
       </aside>
 
-      {"_id" in note ? (
-        <EditorBox key={String(note._id)} {...note} />
-      ) : (
-        <div className="flex flex-1 items-center justify-center">
-          <TypographyH4>"Note not found."</TypographyH4>
-        </div>
-      )}
+      <EditorBox key={String(note._id)} {...note} />
     </main>
+  )
+}
+
+const NoteListCard = (props: {
+  note: Note
+  currentId: string
+  onDeleteNote: (e: React.MouseEvent) => void
+  onNoteSelect?: (note: Note) => void
+}) => {
+  const { note, currentId, onDeleteNote, onNoteSelect } = props
+
+  return (
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <button
+            onClick={() => onNoteSelect?.(note)}
+            className={cn(
+              "flex group flex-col duration-200 ease-out !transition-all items-start justify-center gap-0 w-full border border-transparent bg-transparent hover:bg-muted-foreground/10 rounded-xl px-2.5 py-2",
+              currentId === note._id &&
+                "border-background bg-radial-[at_100%_75%] to-transparent from-background shadow shadow-black/5"
+            )}
+          >
+            <TypographyP className="font-semibold font-sans text-foreground line-clamp-1">
+              {note.title}
+            </TypographyP>
+            <TypographyMuted className="text-xs font-sans">
+              {note.updatedAt ? format(note.updatedAt, "PPp") : "Unknown date"}{" "}
+              - Saved
+            </TypographyMuted>
+          </button>
+        </ContextMenuTrigger>
+
+        <ContextMenuContent className="overflow-hidden" data-stop-open>
+          <ContextMenuItem
+            data-stop-open
+            onClick={onDeleteNote}
+            variant="destructive"
+          >
+            Delete
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    </>
   )
 }

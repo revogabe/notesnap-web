@@ -1,71 +1,39 @@
 "use client"
 
 import {
-  TypographyH4,
-  TypographyMuted,
-  TypographyP,
-} from "@/components/ui/typography"
-import { Badge } from "@/components/ui/badge"
-import { format } from "date-fns/format"
-import { cn } from "@/lib/utils"
-import { Ellipsis, Lock } from "lucide-react"
-import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
 import {
   ContextMenu,
-  ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "../ui/context-menu"
+import {
+  TypographyH4,
+  TypographyMuted,
+  TypographyP,
+} from "@/components/ui/typography"
 
 import { toast } from "sonner"
-import { deleteUserNote, updateUserNote } from "@/services/note.service"
+import { cn } from "@/lib/utils"
 import { Note } from "@/types"
-import { tipTapToText } from "@/utils/tipTapToText"
 import { motion } from "motion/react"
+import { Badge } from "@/components/ui/badge"
+import { format } from "date-fns/format"
+import { tipTapToText } from "@/utils/tipTapToText"
+import { Ellipsis, Lock } from "lucide-react"
 
-const host = process.env.NEXT_PUBLIC_HOST
-const port = process.env.NEXT_PUBLIC_PORT
+import { deleteUserNote } from "@/services/note.service"
 
 export const NoteCard = (note: Note) => {
   const handleDeleteNote = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
     if (!note._id) return
     const response = await deleteUserNote(note._id.toString())
     if (response.message) return toast(response.message)
-  }
-
-  const handleShareLink = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation()
-    e.preventDefault()
-    navigator.clipboard.writeText(
-      `${host}${port ? `:${port}` : ""}/collaborator/${note._id}`
-    )
-    toast("Link copied to clipboard!")
-  }
-
-  const handleToogleVisibility = async (visibility: "public" | "private") => {
-    const response = await updateUserNote({
-      _id: String(note._id),
-      companion: {
-        visibility,
-        emailAllow: note.companion?.emailAllow ?? [],
-      },
-    })
-    toast(response.message)
   }
 
   return (
@@ -84,12 +52,6 @@ export const NoteCard = (note: Note) => {
             "bg-gradient-to-t from-white to-muted"
           )}
         >
-          {note.companion?.visibility === "private" && (
-            <Lock
-              size={20}
-              className="text-muted-foreground opacity-80 absolute top-5 right-5"
-            />
-          )}
           {note.tags.length > 0 && (
             <div className="flex gap-1.5 mb-2 flex-wrap">
               {note.tags.map((tag) => (
@@ -121,52 +83,12 @@ export const NoteCard = (note: Note) => {
             <DropdownMenu>
               <DropdownMenuTrigger
                 data-stop-open
-                // impedir que clique no trigger abra o drawer
-                onClick={(e) => e.stopPropagation()}
                 className="hover:bg-muted-foreground/25 duration-200 ease-out px-1 h-7 rounded-lg"
               >
                 <Ellipsis size={24} className="text-muted-foreground" />
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="overflow-hidden" data-stop-open>
-                <DropdownMenuItem
-                  data-stop-open
-                  onClick={handleShareLink}
-                  disabled={note.companion?.visibility === "private"}
-                >
-                  Share Link
-                </DropdownMenuItem>
-
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger data-stop-open>
-                    Visibility
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent data-stop-open>
-                    <DropdownMenuCheckboxItem
-                      data-stop-open
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        e.preventDefault()
-                        handleToogleVisibility("public")
-                      }}
-                      checked={note.companion?.visibility === "public"}
-                    >
-                      Public
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      data-stop-open
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        e.preventDefault()
-                        handleToogleVisibility("private")
-                      }}
-                      checked={note.companion?.visibility === "private"}
-                    >
-                      Private
-                    </DropdownMenuCheckboxItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-
                 <DropdownMenuItem
                   data-stop-open
                   onClick={handleDeleteNote}
@@ -182,38 +104,6 @@ export const NoteCard = (note: Note) => {
 
       {/* Context menu (clique direito) - por segurança, também marcamos */}
       <ContextMenuContent className="overflow-hidden" data-stop-open>
-        <ContextMenuItem data-stop-open onClick={handleShareLink as any}>
-          Share Link
-        </ContextMenuItem>
-        <ContextMenuSub>
-          <ContextMenuSubTrigger data-stop-open>
-            Visibility
-          </ContextMenuSubTrigger>
-          <ContextMenuSubContent data-stop-open>
-            <ContextMenuCheckboxItem
-              data-stop-open
-              onClick={(e) => {
-                e.stopPropagation()
-                e.preventDefault()
-                handleToogleVisibility("public")
-              }}
-              checked={note.companion?.visibility === "public"}
-            >
-              Public
-            </ContextMenuCheckboxItem>
-            <ContextMenuCheckboxItem
-              data-stop-open
-              onClick={(e) => {
-                e.stopPropagation()
-                e.preventDefault()
-                handleToogleVisibility("private")
-              }}
-              checked={note.companion?.visibility === "private"}
-            >
-              Private
-            </ContextMenuCheckboxItem>
-          </ContextMenuSubContent>
-        </ContextMenuSub>
         <ContextMenuItem
           data-stop-open
           onClick={handleDeleteNote}

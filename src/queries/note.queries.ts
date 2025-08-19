@@ -2,19 +2,11 @@ import { NoteModel } from "@/models/note.model"
 import { Note } from "@/types"
 import { serializeMongo } from "@/utils/serializeMongo"
 
-export async function createNewNote(
-  userId: string,
-  userEmail: string,
-  title?: string
-) {
+export async function createNewNote(userId: string, title?: string) {
   const note = await NoteModel.create({
     title: title || "Untitled Note",
     tags: [],
     images: [],
-    companion: {
-      visibility: "private",
-      emailAllow: [userEmail],
-    },
     userId: userId,
   })
 

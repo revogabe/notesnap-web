@@ -18,7 +18,6 @@ export const useNotesPositionStore = create<NotesPositionState>()(
   persist(
     (set) => ({
       positions: [],
-
       setPosition: (id, x, y) =>
         set((state) => {
           const exists = state.positions.find((p) => p.id === id)
@@ -40,8 +39,8 @@ export const useNotesPositionStore = create<NotesPositionState>()(
             .filter((note) => !existingIds.has(String(note._id)))
             .map((note, idx) => ({
               id: String(note._id),
-              x: 50 * (state.positions.length + idx),
-              y: 50 * (state.positions.length + idx),
+              x: 10 * (state.positions.length + idx),
+              y: 10 * (state.positions.length + idx),
             }))
 
           // mantém as antigas e adiciona só as novas

@@ -21,69 +21,50 @@ import Superscript from "@tiptap/extension-superscript"
 import Subscript from "@tiptap/extension-subscript"
 import Document from "@tiptap/extension-document"
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
-import { updateUserNote } from "@/services/note.service"
-import { toast } from "sonner"
 
-import Collaboration from "@tiptap/extension-collaboration"
-import CollaborationCaret from "@tiptap/extension-collaboration-caret"
-import { CollabEditor, Note } from "@/types"
+import { Note } from "@/types"
+import { toast } from "sonner"
 import { useNoteStore } from "@/store/note-store"
+import { updateUserNote } from "@/services/note.service"
 
 type NoteEditorProps = {
   note: Note
-  userName?: string
   onImageReceived?: (editor: ReturnType<typeof useEditor>) => void
 }
 
-export const NoteEditor = ({
-  note,
-  userName,
-  onImageReceived,
-  provider,
-  document: yjsDoc,
-}: NoteEditorProps & CollabEditor) => {
+const extensions = [
+  StarterKit.configure({
+    horizontalRule: false,
+    link: { openOnClick: false, enableClickSelection: true },
+  }),
+  TextAlign.configure({ types: ["heading", "paragraph"] }),
+  TaskList,
+  TaskItem.configure({ nested: true }),
+  Highlight.configure({ multicolor: true }),
+  Image,
+  Typography,
+  Superscript,
+  Subscript,
+  Selection,
+  Document,
+  Placeholder.configure({ placeholder: "Write something..." }),
+  Dropcursor,
+]
+
+export const NoteEditor = ({ note, onImageReceived }: NoteEditorProps) => {
   const noteId = String(note._id)
+  const lastContentRef = React.useRef<string | null>(null)
+  const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null)
 
   const noteStore = useNoteStore()
   const storedNote = noteStore.getNote(noteId)
-
   const [noteTitle, setNoteTitle] = useState(note.title)
-
-  const lastContentRef = React.useRef<string | null>(null)
-  const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null)
 
   const initialContent = storedNote?.content
     ? JSON.parse(storedNote.content)
     : note.content
     ? JSON.parse(note.content)
     : ""
-
-  const extensions = [
-    StarterKit.configure({
-      horizontalRule: false,
-      link: { openOnClick: false, enableClickSelection: true },
-    }),
-    TextAlign.configure({ types: ["heading", "paragraph"] }),
-    TaskList,
-    TaskItem.configure({ nested: true }),
-    Highlight.configure({ multicolor: true }),
-    Image,
-    Typography,
-    Superscript,
-    Subscript,
-    Selection,
-    Document,
-    CharacterCount.extend().configure({ limit: 10000 }),
-    Placeholder.configure({ placeholder: "Write something..." }),
-    Dropcursor,
-  ]
-
-  if (yjsDoc && provider) {
-    extensions.push(
-      Collaboration.configure({ document: yjsDoc }),
-      CollaborationCaret.configure({ provider })
-    )
-  }
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -122,16 +103,9 @@ export const NoteEditor = ({
         }
       }, 1000)
     },
-    onContentError: ({ disableCollaboration }) => {
-      disableCollaboration()
-    },
   })
 
-  React.useEffect(() => {
-    if (!userName || !editor) return
-    editor.chain().focus().updateUser({ name: userName }).run()
-  }, [editor, userName])
-
+  /* Update Image on Editor */
   React.useEffect(() => {
     if (editor && onImageReceived) onImageReceived(editor)
   }, [editor, onImageReceived])

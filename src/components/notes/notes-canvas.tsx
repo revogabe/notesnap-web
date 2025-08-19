@@ -19,7 +19,7 @@ import {
   DrawerTitle,
 } from "../ui/drawer"
 import { useNotesPositionStore } from "@/store/note-position-store"
-import { NoteContentPage } from "./note-content"
+import { NoteContent } from "./note-content"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { useDrawerNoteStore } from "@/store/note-drawer"
 
@@ -57,7 +57,6 @@ function DraggableNote({
       onClick={(e) => {
         if (isDragging) return
         const target = e.target as HTMLElement
-        // se clicou em qualquer coisa marcada como ação/menú, NÃO abre o drawer
         if (target.closest("[data-stop-open]")) return
         onCardClick()
       }}
@@ -79,7 +78,6 @@ export const NotesCanvas: React.FC<{ notes: Note[] }> = ({ notes }) => {
     initPositions(notes)
   }, [notes, initPositions])
 
-  // sensores do dnd-kit: só inicia drag depois de mover um pouco
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: { distance: 0.5 },
@@ -133,7 +131,7 @@ export const NotesCanvas: React.FC<{ notes: Note[] }> = ({ notes }) => {
                 <DrawerTitle>{activeNote.title}</DrawerTitle>
                 <DrawerDescription>{activeNote.content}</DrawerDescription>
               </VisuallyHidden>
-              <NoteContentPage
+              <NoteContent
                 note={activeNote}
                 notes={notes}
                 onNoteSelect={setActiveNote}

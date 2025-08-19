@@ -1,5 +1,5 @@
 import { NoteCommand } from "@/components/notes/note-command"
-import { NotesClientPage } from "@/components/notes/note-page"
+import { NotesClientPage } from "@/pages/note-page"
 import { getUserNotes } from "@/services/note.service"
 
 export default async function NotesPage() {

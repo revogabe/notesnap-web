@@ -1,4 +1,3 @@
-// lib/auth.ts
 import mongoose from "mongoose"
 import { betterAuth } from "better-auth"
 import { mongodbAdapter } from "better-auth/adapters/mongodb"

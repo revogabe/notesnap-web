@@ -13,13 +13,11 @@ import { revalidatePath } from "next/cache"
 import { Note } from "@/types"
 
 export async function createUserNote(title?: string) {
-  // if user is not authenticated
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error("Unauthorized")
 
   const userId = session.user.id
-  const userEmail = session.user.email
-  const note = await createNewNote(userId, userEmail, title)
+  const note = await createNewNote(userId, title)
 
   if (!note) throw new Error("Failed to create note")
 
@@ -28,7 +26,6 @@ export async function createUserNote(title?: string) {
 }
 
 export async function updateUserNote(note: Partial<Note> & { _id: string }) {
-  // if user is not authenticated
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error("Unauthorized")
 
@@ -41,7 +38,6 @@ export async function updateUserNote(note: Partial<Note> & { _id: string }) {
 }
 
 export async function deleteUserNote(noteId: string) {
-  // if user is not authenticated
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error("Unauthorized")
 
@@ -55,7 +51,6 @@ export async function deleteUserNote(noteId: string) {
 }
 
 export async function getUserNotes() {
-  // if user is not authenticated
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error("Unauthorized")
 
@@ -72,20 +67,6 @@ export async function getUserNoteById(noteId: string) {
 
   const note = await findNoteById(noteId)
   if (!note) throw new Error("Note not found")
-
-  if (note.companion?.visibility === "private") {
-    if (!session || session.user.id !== String(note.userId)) {
-      return { message: "You do not have access to this note." }
-    }
-  }
-
-  if (
-    note.companion?.visibility === "public" &&
-    Array.isArray(note.companion.emailAllow) &&
-    note.companion.emailAllow.length > 0
-  ) {
-    if (!session) throw new Error("Unauthorized")
-  }
 
   return note
 }

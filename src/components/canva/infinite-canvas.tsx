@@ -1,20 +1,21 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface InfiniteCanvasProps {
   children: React.ReactNode
 }
 
 export const InfiniteCanvas: React.FC<InfiniteCanvasProps> = ({ children }) => {
+  const lastPos = useRef({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
+
   const [scale, setScale] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [isPanning, setIsPanning] = useState(false)
   const [spacePressed, setSpacePressed] = useState(false)
-  const lastPos = useRef({ x: 0, y: 0 })
 
-  // Det
+  /* Detect space key press */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeEl = document.activeElement
@@ -61,7 +62,7 @@ export const InfiniteCanvas: React.FC<InfiniteCanvasProps> = ({ children }) => {
     }
   }, [])
 
-  // Pan with mouse
+  /* Pan with mouse */
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
       if (spacePressed && e.button === 0) {
@@ -95,7 +96,7 @@ export const InfiniteCanvas: React.FC<InfiniteCanvasProps> = ({ children }) => {
     }
   }, [isPanning, spacePressed])
 
-  // Zoom with scroll + Ctrl
+  /* Zoom with scroll + Ctrl */
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (!e.ctrlKey) return

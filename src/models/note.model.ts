@@ -1,23 +1,14 @@
 import mongoose, { Schema, model, Types, Document } from "mongoose"
 
-export interface ICompanion {
-  visibility: "private" | "public"
-}
-
 export interface INote extends Document {
   title: string
   content?: string
   tags: string[]
   images: string[]
   userId: Types.ObjectId
-  companion?: ICompanion
   createdAt: Date
   updatedAt: Date
 }
-
-const CompanionSchema = new Schema<ICompanion>({
-  visibility: { type: String, enum: ["private", "public"], required: true },
-})
 
 const NoteSchema = new Schema<INote>({
   title: { type: String, required: true },
@@ -25,7 +16,6 @@ const NoteSchema = new Schema<INote>({
   tags: [String],
   images: [String],
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  companion: { type: CompanionSchema, required: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 })
