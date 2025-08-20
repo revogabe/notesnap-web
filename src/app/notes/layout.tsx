@@ -3,6 +3,11 @@ import { headers } from "next/headers"
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 
+// Ensure this route tree is always dynamic at runtime and not prerendered
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const runtime = "nodejs"
+
 export const metadata: Metadata = {
   title: "NoteSnap - Your Notes",
   description: "Manage and organize your notes with NoteSnap",

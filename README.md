@@ -111,6 +111,10 @@ Create a `.env.local` file at the project root (or set these in your hosting pla
 # MongoDB (Better Auth + app data)
 DATABASE_URL="mongodb://localhost:27017/notesnap"
 
+# Better Auth
+BETTER_AUTH_SECRET=<JWT>
+NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
+
 # Social auth (GitHub)
 GITHUB_CLIENT_ID="your_github_client_id"
 GITHUB_CLIENT_SECRET="your_github_client_secret"
