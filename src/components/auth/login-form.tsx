@@ -1,6 +1,6 @@
 "use client"
 
-import { GalleryVerticalEnd } from "lucide-react"
+import { NotebookPen } from "lucide-react"
 
 import z from "zod"
 import Link from "next/link"
@@ -64,11 +64,12 @@ export function LoginForm({
               className="flex flex-col items-center gap-2 font-medium"
             >
               <div className="flex size-8 items-center justify-center rounded-md">
-                <GalleryVerticalEnd className="size-6" />
+                <NotebookPen className="size-12" />
               </div>
-              <span className="sr-only">Acme Inc.</span>
+              <span className="sr-only">NoteSnap</span>
             </a>
-            <h1 className="text-xl font-bold">Welcome to Acme Inc.</h1>
+            <h1 className="text-xl font-bold mt-2">NoteSnap</h1>
+
             <div className="text-center text-sm">
               Don&apos;t have an account?{" "}
               <Link href="/sign-up" className="underline underline-offset-4">
@@ -92,8 +93,15 @@ export function LoginForm({
                 placeholder="••••••••"
                 {...register("password")}
               />
+              {errors.root && (
+                <p className="text-red-500 text-sm">{errors.root.message}</p>
+              )}
             </div>
-            <Button type="submit" className="w-full">
+            <Button
+              disabled={isSubmitting}
+              type="submit"
+              className="w-full rounded-xl"
+            >
               Login
             </Button>
           </div>
@@ -104,10 +112,11 @@ export function LoginForm({
           </div>
           <div className="w-full">
             <Button
+              disabled={isSubmitting}
               onClick={() => authClient.signIn.social({ provider: "github" })}
               variant="outline"
               type="button"
-              className="w-full"
+              className="w-full rounded-xl"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -129,10 +138,6 @@ export function LoginForm({
           </div>
         </div>
       </form>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </div>
     </div>
   )
 }
