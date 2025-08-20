@@ -5,7 +5,7 @@ import { InfiniteCanvas } from "@/components/canva/infinite-canvas"
 import { Note } from "@/types"
 
 const NotesCanvas = dynamic(
-  () => import("../components/notes/notes-canvas").then((m) => m.NotesCanvas),
+  () => import("./notes-canvas").then((m) => m.NotesCanvas),
   { ssr: false }
 )
 

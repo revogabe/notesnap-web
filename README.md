@@ -147,6 +147,10 @@ docker run -d \
   mongo:7
 ```
 
+```bash
+pnpx supabase start
+```
+
 Steps:
 
 ```bash
