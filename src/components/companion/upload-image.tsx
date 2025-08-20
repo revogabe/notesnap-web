@@ -39,12 +39,29 @@ export const UploadImage = (note: UploadImageProps) => {
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return
+
     const file = e.target.files[0]
-    const fileBase64 = await fileToBase64(file)
+    const ext = file.name.split(".").pop() || "bin"
+    const objectPath = `notes/${note._id}/${Date.now()}.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from("note-images")
+      .upload(objectPath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      })
+    if (uploadError) {
+      const fileBase64 = await fileToBase64(file)
+      await axios.post("/api/upload-image", {
+        noteId: note._id,
+        fileBase64,
+        fileName: file.name,
+      })
+      return
+    }
+
     await axios.post("/api/upload-image", {
       noteId: note._id,
-      fileBase64,
-      fileName: file.name,
+      path: objectPath,
     })
   }
 

@@ -27,6 +27,8 @@ export default defineConfig({
     alias: {
       '@': new URL('./src', import.meta.url).pathname,
       '@src': new URL('./src', import.meta.url).pathname,
+      // Stub Next.js runtime-only module for Vitest
+      'server-only': new URL('./vitest.server-only.stub.ts', import.meta.url).pathname,
     },
   },
 })

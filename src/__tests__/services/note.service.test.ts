@@ -4,7 +4,7 @@ import * as noteQueries from "@src/queries/note.queries"
 // Hoist a shared mock for auth so importing services doesn't connect to Mongo
 const getSession = vi.hoisted(() => vi.fn())
 vi.mock("@/lib/auth", () => ({
-  auth: { api: { getSession } },
+  getAuth: async () => ({ api: { getSession } }),
 }))
 import {
   createUserNote,

@@ -19,6 +19,11 @@ vi.mock("@/queries/note.queries", () => ({
   findNoteById: vi.fn().mockResolvedValue({ _id: "n1" }),
 }))
 
+// Avoid connecting to Mongo during route tests
+vi.mock("@/lib/auth", () => ({
+  ensureMongoConnected: vi.fn(),
+}))
+
 function makeRequest(body: any) {
   return {
     json: async () => body,
