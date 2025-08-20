@@ -41,27 +41,11 @@ export const UploadImage = (note: UploadImageProps) => {
     if (!e.target.files?.[0]) return
 
     const file = e.target.files[0]
-    const ext = file.name.split(".").pop() || "bin"
-    const objectPath = `notes/${note._id}/${Date.now()}.${ext}`
-    const { error: uploadError } = await supabase.storage
-      .from("note-images")
-      .upload(objectPath, file, {
-        cacheControl: "3600",
-        upsert: false,
-      })
-    if (uploadError) {
-      const fileBase64 = await fileToBase64(file)
-      await axios.post("/api/upload-image", {
-        noteId: note._id,
-        fileBase64,
-        fileName: file.name,
-      })
-      return
-    }
-
+    const fileBase64 = await fileToBase64(file)
     await axios.post("/api/upload-image", {
       noteId: note._id,
-      path: objectPath,
+      fileBase64,
+      fileName: file.name,
     })
   }
 

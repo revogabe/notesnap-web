@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-vi.mock("@/lib/supabase", () => {
+vi.mock("@/lib/supabaseServer", () => {
   const upload = vi.fn().mockResolvedValue({ data: { path: "p" }, error: null })
   const getPublicUrl = vi
     .fn()
     .mockReturnValue({ data: { publicUrl: "http://u" } })
   const insert = vi.fn().mockResolvedValue({ error: null })
   return {
-    supabase: {
+    getSupabaseServer: () => ({
       storage: {
         from: () => ({ upload, getPublicUrl }),
       },
       from: () => ({ insert }),
-    },
+    }),
   }
 })
 
@@ -64,11 +64,18 @@ describe("POST /api/upload-image", () => {
   })
 
   it("handles supabase errors gracefully", async () => {
-    const supa = await import("@/lib/supabase")
+    const supa = await import("@/lib/supabaseServer")
     // @ts-ignore
-    supa.supabase.storage.from = () => ({
-      upload: vi.fn().mockResolvedValue({ data: null, error: new Error("x") }),
-      getPublicUrl: vi.fn(),
+    supa.getSupabaseServer = () => ({
+      storage: {
+        from: () => ({
+          upload: vi
+            .fn()
+            .mockResolvedValue({ data: null, error: new Error("x") }),
+          getPublicUrl: vi.fn(),
+        }),
+      },
+      from: () => ({}),
     })
 
     const queries = await import("@/queries/note.queries")
