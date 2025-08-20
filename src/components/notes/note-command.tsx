@@ -39,15 +39,20 @@ export function NoteCommand({ notes }: NoteCommandProps) {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "t" && (e.metaKey || e.ctrlKey)) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault()
-        setOpen((o) => !o)
+        e.stopPropagation()
+        setOpen((open) => !open)
+        return
       }
 
       if (
         (e.key === "Delete" || e.key === "Backspace") &&
         (e.metaKey || e.ctrlKey)
       ) {
+        e.preventDefault()
+        e.stopPropagation()
+
         const note = filteredNotes[selectedIndex]
         if (note) {
           deleteUserNote(String(note._id)).then((response) => {
@@ -57,8 +62,8 @@ export function NoteCommand({ notes }: NoteCommandProps) {
       }
     }
 
-    document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
+    window.addEventListener("keydown", down, true)
+    return () => window.removeEventListener("keydown", down, true)
   }, [filteredNotes, selectedIndex])
 
   const handleCreateNote = async () => {
@@ -74,7 +79,7 @@ export function NoteCommand({ notes }: NoteCommandProps) {
         <p className="text-muted-foreground text-sm">
           Press{" "}
           <kbd className="bg-muted text-muted-foreground pointer-events-none inline-flex h-5 leading-0 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none">
-            <span className="text-sm mt-0.5 mr-0.5">⌘</span>+ T
+            <span className="text-sm mt-0.5 mr-0.5">⌘</span>+ K
           </kbd>{" "}
           to open the menu
         </p>

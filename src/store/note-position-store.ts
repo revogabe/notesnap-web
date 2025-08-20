@@ -39,8 +39,8 @@ export const useNotesPositionStore = create<NotesPositionState>()(
             .filter((note) => !existingIds.has(String(note._id)))
             .map((note, idx) => ({
               id: String(note._id),
-              x: 10 * (state.positions.length + idx),
-              y: 10 * (state.positions.length + idx),
+              x: window.innerWidth / 2,
+              y: window.innerHeight / 2,
             }))
 
           // mantém as antigas e adiciona só as novas
