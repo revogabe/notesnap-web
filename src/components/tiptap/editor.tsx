@@ -110,6 +110,66 @@ export const NoteEditor = ({ note, onImageReceived }: NoteEditorProps) => {
     if (editor && onImageReceived) onImageReceived(editor)
   }, [editor, onImageReceived])
 
+  React.useEffect(() => {
+    if (!editor) return
+
+    const root = editor.view.dom as HTMLElement
+
+    const enhanceImage = (img: HTMLImageElement) => {
+      if (img.dataset.enhanced === "true") return
+
+      img.loading = "lazy"
+      img.classList.add("img-loading")
+
+      const handleLoad = () => {
+        img.classList.remove("img-loading")
+        img.classList.add("img-loaded")
+        img.removeEventListener("load", handleLoad)
+        img.removeEventListener("error", handleError)
+      }
+
+      const handleError = () => {
+        img.classList.remove("img-loading")
+        img.removeEventListener("load", handleLoad)
+        img.removeEventListener("error", handleError)
+      }
+
+      if (img.complete && img.naturalWidth > 0) {
+        handleLoad()
+      } else {
+        img.addEventListener("load", handleLoad)
+        img.addEventListener("error", handleError)
+      }
+
+      img.dataset.enhanced = "true"
+    }
+
+    const enhanceAll = (node: Element | DocumentFragment) => {
+      if (node instanceof HTMLImageElement) {
+        enhanceImage(node)
+      } else if (node instanceof Element || node instanceof DocumentFragment) {
+        node
+          .querySelectorAll("img")
+          .forEach((img) => enhanceImage(img as HTMLImageElement))
+      }
+    }
+
+    // Initial pass
+    enhanceAll(root)
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((n) => enhanceAll(n as Element))
+        }
+      }
+    })
+
+    observer.observe(root, { childList: true, subtree: true })
+
+    return () => observer.disconnect()
+  }, [editor])
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value
     setNoteTitle(newTitle)

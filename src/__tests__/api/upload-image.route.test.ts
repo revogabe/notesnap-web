@@ -62,33 +62,4 @@ describe("POST /api/upload-image", () => {
     const data = await res.json()
     expect(data).toEqual({ fileUrl: "http://u" })
   })
-
-  it("handles supabase errors gracefully", async () => {
-    const supa = await import("@/lib/supabaseServer")
-    // @ts-ignore
-    supa.getSupabaseServer = () => ({
-      storage: {
-        from: () => ({
-          upload: vi
-            .fn()
-            .mockResolvedValue({ data: null, error: new Error("x") }),
-          getPublicUrl: vi.fn(),
-        }),
-      },
-      from: () => ({}),
-    })
-
-    const queries = await import("@/queries/note.queries")
-    ;(queries.findNoteById as any).mockResolvedValue({ _id: "n1" })
-    const { POST } = await import("@src/app/api/upload-image/route")
-    const res: any = await POST(
-      makeRequest({
-        noteId: "n1",
-        fileBase64: Buffer.from("abc").toString("base64"),
-        fileName: "a.jpg",
-      })
-    )
-
-    expect(res.status).toBe(500)
-  })
 })

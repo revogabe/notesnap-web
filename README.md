@@ -122,6 +122,7 @@ GITHUB_CLIENT_SECRET="your_github_client_secret"
 # Supabase (Client/Anon)
 NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your_anon_key"
+SUPABASE_SERVICE_ROLE_KEY="your_service_role_key"
 
 # Host/Port used to generate the Companion QR
 NEXT_PUBLIC_HOST="http://localhost"

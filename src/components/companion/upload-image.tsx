@@ -1,5 +1,6 @@
 "use client"
 
+import "@/app/globals.css"
 import axios from "axios"
 import { supabase } from "@/lib/supabase"
 import { useEffect, useState } from "react"
@@ -14,6 +15,7 @@ type UploadImageProps = {
 
 export const UploadImage = (note: UploadImageProps) => {
   const [images, setImages] = useState<string[]>([])
+  const [loaded, setLoaded] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const channel = supabase
@@ -75,14 +77,28 @@ export const UploadImage = (note: UploadImageProps) => {
         <input type="file" onChange={handleUpload} className="hidden" />
 
         <div className="w-full  grid grid-cols-2 gap-4 justify-start items-start p-8">
-          {images.map((img) => (
-            <img
-              key={img}
-              src={img}
-              alt="Note Image"
-              className="mb-4 w-full rounded-lg break-inside"
-            />
-          ))}
+          {images.map((img) => {
+            const isLoaded = loaded[img]
+            return (
+              <div key={img} className="relative w-full">
+                {!isLoaded && (
+                  <div className="absolute inset-0 animate-pulse rounded-lg border border-border ring-4 ring-white shadow-sm shadow-black/10 overflow-hidden">
+                    <div className="w-full h-full bg-muted" />
+                  </div>
+                )}
+
+                <img
+                  src={img}
+                  loading="lazy"
+                  alt="Note Image"
+                  onLoad={() => setLoaded((prev) => ({ ...prev, [img]: true }))}
+                  className={`mb-5 w-full rounded-lg animate-pulse break-inside ring-4 ring-white border border-border shadow-sm shadow-black/10 ${
+                    isLoaded ? "img-loaded" : "img-loading"
+                  }`}
+                />
+              </div>
+            )
+          })}
         </div>
       </label>
     </div>

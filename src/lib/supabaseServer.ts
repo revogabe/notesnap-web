@@ -1,6 +1,6 @@
-import 'server-only'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import { Database } from '../../database.types'
+import "server-only"
+import { createClient, SupabaseClient } from "@supabase/supabase-js"
+import { Database } from "../../database.types"
 
 export type SupabaseServerClient = SupabaseClient<Database>
 
@@ -9,11 +9,11 @@ export function getSupabaseServer(): SupabaseServerClient {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) {
     throw new Error(
-      'Missing Supabase env: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'
+      "Missing Supabase env: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY"
     )
   }
   return createClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
-    global: { headers: { 'X-Client-Info': 'notesnap-web/server' } },
+    global: { headers: { "X-Client-Info": "notesnap-web/server" } },
   })
 }

@@ -40,13 +40,15 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --animate-ripple: ripple var(--duration,2s) ease calc(var(--i, 0)*.2s) infinite;
+  --animate-ripple: ripple var(--duration, 2s) ease calc(var(--i, 0) * 0.2s)
+    infinite;
   @keyframes ripple {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
+    0%,
+    100% {
+      transform: translate(-50%, -50%) scale(1);
     }
-  50% {
-    transform: translate(-50%, -50%) scale(0.9);
+    50% {
+      transform: translate(-50%, -50%) scale(0.9);
     }
   }
 }
@@ -327,6 +329,7 @@
     margin: 1.5rem 0;
     max-width: 100%;
     border-radius: 1rem;
+    box-shadow: 0px 0px 0px 6px var(--color-secondary);
 
     transform: scale(0.8);
     opacity: 0;
@@ -351,5 +354,41 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  @keyframes skeletonShimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  img.img-loading {
+    opacity: 1;
+    transform: none;
+    filter: blur(2px);
+    background: linear-gradient(
+      90deg,
+      var(--muted) 25%,
+      var(--border) 37%,
+      var(--muted) 63%
+    );
+    background-size: 400% 100%;
+    animation: skeletonShimmer 3s ease-in-out infinite;
+    min-height: 200px;
+    width: 100%;
+    object-fit: cover;
+    transition: filter 0.3s ease;
+  }
+
+  img.img-loaded {
+    animation: imageEntry 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    filter: none;
+    background: transparent;
+    min-height: 0;
   }
 }
