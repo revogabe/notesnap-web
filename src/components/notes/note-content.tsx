@@ -1,3 +1,5 @@
+"use client"
+
 import {
   TypographyH4,
   TypographyMuted,
@@ -22,6 +24,8 @@ import { ChevronDown } from "lucide-react"
 import { Note } from "@/types"
 import { deleteUserNote } from "@/services/note.service"
 import { useDrawerNoteStore } from "@/store/note-drawer"
+import { AnimatePresence, motion } from "motion/react"
+import { useSidebarStore } from "@/store/note-sidebar"
 
 type NoteContentProps = {
   note: Note
@@ -31,6 +35,7 @@ type NoteContentProps = {
 
 export function NoteContent({ note, notes, onNoteSelect }: NoteContentProps) {
   const setActiveNote = useDrawerNoteStore((state) => state.setActiveNote)
+  const { open } = useSidebarStore()
 
   const handleDeleteNote = async (e: React.MouseEvent, noteId: string) => {
     e.stopPropagation()
@@ -43,43 +48,56 @@ export function NoteContent({ note, notes, onNoteSelect }: NoteContentProps) {
 
   return (
     <main className="w-full flex h-screen items-start justify-between overflow-hidden bg-secondary p-5">
-      <aside className="w-full max-w-[300px] mr-6">
-        <div
-          className={cn(
-            "flex gap-3 items-center justify-start w-full px-2.5 py-2.5",
-            "border border-border rounded-3xl",
-            "bg-background"
-          )}
-        >
-          <DrawerClose asChild>
-            <Button size="icon" variant="outline" className="rounded-xl">
-              <ChevronDown />
-            </Button>
-          </DrawerClose>
-          <div>
-            <TypographyH4 className="font-bold text-base line-clamp-1 font-sans">
-              {note.title}
-            </TypographyH4>
-            <TypographyMuted className="text-xs font-sans">
-              {note.updatedAt ? format(note.updatedAt, "PPp") : "Unknown date"}{" "}
-              - Saved
-            </TypographyMuted>
-          </div>
-        </div>
-        <ScrollArea className="h-[calc(100vh-100px)] overflow-y-auto relative pt-4">
-          <div className="flex flex-col gap-1">
-            {notes.map((n: Note) => (
-              <NoteListCard
-                key={`${n.title}-${n.updatedAt}`}
-                note={n}
-                currentId={String(note._id)}
-                onNoteSelect={onNoteSelect}
-                onDeleteNote={(e) => handleDeleteNote(e, String(n._id))}
-              />
-            ))}
-          </div>
-        </ScrollArea>
-      </aside>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.aside
+            key="note-sidebar"
+            initial={{ width: 0, marginRight: 0, opacity: 0 }}
+            animate={{ width: 300, marginRight: 24, opacity: 1 }}
+            exit={{ width: 0, marginRight: 0, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 34 }}
+            className="overflow-hidden"
+          >
+            <div
+              className={cn(
+                "flex gap-3 items-center justify-start w-full px-2.5 py-2.5 truncate",
+                "border border-border rounded-3xl",
+                "bg-background"
+              )}
+            >
+              <DrawerClose asChild>
+                <Button size="icon" variant="outline" className="rounded-xl">
+                  <ChevronDown />
+                </Button>
+              </DrawerClose>
+              <div>
+                <TypographyH4 className="font-bold text-base line-clamp-1 font-sans">
+                  {note.title}
+                </TypographyH4>
+                <TypographyMuted className="text-xs font-sans">
+                  {note.updatedAt
+                    ? format(note.updatedAt, "PPp")
+                    : "Unknown date"}{" "}
+                  - Saved
+                </TypographyMuted>
+              </div>
+            </div>
+            <ScrollArea className="h-[calc(100vh-100px)] overflow-y-auto relative pt-4 truncate">
+              <div className="flex flex-col gap-1">
+                {notes.map((n: Note) => (
+                  <NoteListCard
+                    key={`${n.title}-${n.updatedAt}`}
+                    note={n}
+                    currentId={String(note._id)}
+                    onNoteSelect={onNoteSelect}
+                    onDeleteNote={(e) => handleDeleteNote(e, String(n._id))}
+                  />
+                ))}
+              </div>
+            </ScrollArea>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
       <EditorBox key={String(note._id)} {...note} />
     </main>
