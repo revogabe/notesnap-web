@@ -1,6 +1,6 @@
 "use server"
 
-import { auth } from "@/lib/auth"
+import { getAuth } from "@/lib/auth"
 import { headers } from "next/headers"
 import {
   findNotesByUser,
@@ -13,6 +13,7 @@ import { revalidatePath } from "next/cache"
 import { Note } from "@/types"
 
 export async function createUserNote(title?: string) {
+  const auth = await getAuth()
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error("Unauthorized")
 
@@ -26,6 +27,7 @@ export async function createUserNote(title?: string) {
 }
 
 export async function updateUserNote(note: Partial<Note> & { _id: string }) {
+  const auth = await getAuth()
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error("Unauthorized")
 
@@ -38,6 +40,7 @@ export async function updateUserNote(note: Partial<Note> & { _id: string }) {
 }
 
 export async function deleteUserNote(noteId: string) {
+  const auth = await getAuth()
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error("Unauthorized")
 
@@ -51,6 +54,7 @@ export async function deleteUserNote(noteId: string) {
 }
 
 export async function getUserNotes() {
+  const auth = await getAuth()
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) throw new Error("Unauthorized")
 
@@ -63,6 +67,7 @@ export async function getUserNotes() {
 }
 
 export async function getUserNoteById(noteId: string) {
+  const auth = await getAuth()
   const session = await auth.api.getSession({ headers: await headers() })
 
   const note = await findNoteById(noteId)

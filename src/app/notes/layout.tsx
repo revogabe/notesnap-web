@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+import { getAuth } from "@/lib/auth"
 import { headers } from "next/headers"
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
@@ -13,6 +13,7 @@ export default async function NoteLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const auth = await getAuth()
   const session = await auth.api.getSession({
     headers: await headers(),
   })

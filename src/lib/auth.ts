@@ -5,18 +5,24 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb"
 
 const mongoURI = process.env.DATABASE_URL as string
 
-async function getDb() {
+export async function ensureMongoConnected() {
   if (mongoose.connection.readyState >= 1 && mongoose.connection.db) {
-    return mongoose.connection.db
+    return
   }
-
   await mongoose.connect(mongoURI)
+}
+
+async function getDb() {
+  await ensureMongoConnected()
   return mongoose.connection.db!
 }
 
-export const auth = await (async () => {
+let authSingleton: ReturnType<typeof betterAuth> | null = null
+
+export async function getAuth() {
+  if (authSingleton) return authSingleton
   const db = await getDb()
-  return betterAuth({
+  authSingleton = betterAuth({
     emailAndPassword: { enabled: true },
     socialProviders: {
       github: {
@@ -26,4 +32,5 @@ export const auth = await (async () => {
     },
     database: mongodbAdapter(db, {}),
   })
-})()
+  return authSingleton
+}

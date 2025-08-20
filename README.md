@@ -155,12 +155,12 @@ Steps:
 
 ```bash
 # 1) Install deps
-npm install
+pnpm install
 
 # 2) Configure .env.local (see env section)
 
 # 3) Run dev server
-npm run dev
+pnpm run dev
 
 # 4) Open the app
 # http://localhost:3000
@@ -169,8 +169,8 @@ npm run dev
 Build and local production:
 
 ```bash
-npm run build
-npm run start
+pnpm run build
+pnpm run start
 ```
 
 ---
@@ -184,13 +184,13 @@ Commands:
 
 ```bash
 # One-off (CI)
-npm test
+pnpm test
 
 # Watch (dev)
-npm run test:watch
+pnpm run test:watch
 
 # Coverage
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 Tip: `src/__tests__/test.setup.ts` injects default env vars and Buffer into the test environment.
