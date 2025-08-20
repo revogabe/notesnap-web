@@ -1,5 +1,9 @@
 import { UploadImage } from "@/components/companion/upload-image"
-import { getSimpleNoteById, getUserNoteById } from "@/services/note.service"
+import { getSimpleNoteById } from "@/services/note.service"
+
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const runtime = "nodejs"
 
 export default async function CompanionPage({
   params,

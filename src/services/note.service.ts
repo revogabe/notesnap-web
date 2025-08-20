@@ -10,6 +10,7 @@ import {
   updateNote,
 } from "@/queries/note.queries"
 import { revalidatePath } from "next/cache"
+import { ensureMongoConnected } from "@/lib/auth"
 import { Note } from "@/types"
 
 export async function createUserNote(title?: string) {
@@ -69,6 +70,7 @@ export async function getUserNotes() {
 export async function getUserNoteById(noteId: string) {
   const auth = await getAuth()
   const session = await auth.api.getSession({ headers: await headers() })
+  if (!session) throw new Error("Unauthorized")
 
   const note = await findNoteById(noteId)
   if (!note) throw new Error("Note not found")
@@ -77,6 +79,7 @@ export async function getUserNoteById(noteId: string) {
 }
 
 export async function getSimpleNoteById(noteId: string) {
+  await ensureMongoConnected()
   const note = await findNoteById(noteId)
   if (!note) throw new Error("Note not found")
 
