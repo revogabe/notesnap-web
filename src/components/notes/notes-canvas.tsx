@@ -22,6 +22,7 @@ import { useNotesPositionStore } from "@/store/note-position-store"
 import { NoteContent } from "./note-content"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { useDrawerNoteStore } from "@/store/note-drawer"
+import { cn } from "@/lib/utils"
 
 // ---- Componente Draggable ----
 function DraggableNote({
@@ -40,6 +41,10 @@ function DraggableNote({
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: String(note._id),
   })
+  const [pointerDown, setPointerDown] = useState(false)
+
+  const handlePointerDown = () => setPointerDown(true)
+  const handlePointerUp = () => setPointerDown(false)
 
   const style = {
     transform: CSS.Translate.toString(transform),
@@ -54,10 +59,11 @@ function DraggableNote({
       {...listeners}
       style={style}
       className="absolute cursor-grab active:cursor-grabbing"
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
       onClick={(e) => {
-        if (isDragging) return
-        const target = e.target as HTMLElement
-        if (target.closest("[data-stop-open]")) return
+        if (pointerDown) return
+        if ((e.target as HTMLElement).closest("[data-stop-open]")) return
         onCardClick()
       }}
     >
@@ -73,10 +79,11 @@ export const NotesCanvas: React.FC<{ notes: Note[] }> = ({ notes }) => {
   const setActiveNote = useDrawerNoteStore((state) => state.setActiveNote)
 
   const [isDragging, setIsDragging] = useState(false)
+  const [drawerInteractive, setDrawerInteractive] = useState(false)
 
   useEffect(() => {
     initPositions(notes)
-  }, [notes, initPositions])
+  }, [notes])
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -94,7 +101,7 @@ export const NotesCanvas: React.FC<{ notes: Note[] }> = ({ notes }) => {
     if (pos) {
       setPosition(String(active.id), pos.x + delta.x, pos.y + delta.y)
     }
-    setIsDragging(false)
+    requestAnimationFrame(() => setIsDragging(false))
   }
 
   const handleNoteClick = (note: Note) => {
@@ -107,7 +114,7 @@ export const NotesCanvas: React.FC<{ notes: Note[] }> = ({ notes }) => {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="relative w-full h-[80vh] border border-muted rounded-xl bg-muted/10">
+      <div className="relative w-full h-[80vh]">
         {notes.map((note) => {
           const pos = positions.find((p) => p.id === String(note._id))
           return (
@@ -123,8 +130,16 @@ export const NotesCanvas: React.FC<{ notes: Note[] }> = ({ notes }) => {
         })}
       </div>
 
-      <Drawer open={!!activeNote} onOpenChange={() => setActiveNote(null)}>
-        <DrawerContent>
+      <Drawer
+        open={!!activeNote}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setActiveNote(null)
+            return
+          }
+        }}
+      >
+        <DrawerContent className="data-[state=closed]:pointer-events-none">
           {activeNote && (
             <>
               <VisuallyHidden>

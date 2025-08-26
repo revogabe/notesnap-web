@@ -58,35 +58,29 @@ export const UploadImage = (note: UploadImageProps) => {
         <TypographyP>Upload an image for this note</TypographyP>
       </div>
 
-      <label className="overflow-hidden relative mt-4 w-full min-h-[70dvh] overflow-y-auto border border-border rounded-3xl ring-4 ring-muted bg-secondary flex flex-col items-center justify-center">
-        {/* Placeholder */}
-        <div className="flex flex-col items-center justify-center absolute inset-0">
-          <div className="rounded-full flex items-center justify-center bg-muted p-4 opacity-50 border border-border">
-            <Camera size={40} className="text-muted-foreground" />
+      <div className="overflow-hidden relative mt-4 w-full min-h-[70dvh] overflow-y-auto border border-border rounded-3xl ring-4 ring-muted bg-secondary flex flex-col items-center justify-start p-4">
+        <label className="border border-border rounded-3xl active:scale-95 ease-out duration-300 w-full bg-background/50 flex items-center justify-center px-4 mx-4">
+          {/* Placeholder */}
+          <div className="flex items-center justify-start gap-4">
+            <div className="rounded-full flex items-center justify-center bg-muted p-4 opacity-50 border border-border">
+              <Camera size={24} className="text-muted-foreground" />
+            </div>
+            <div className="flex flex-col items-start justify-center pt-4 pb-4">
+              <TypographyH3 className="text-foreground text-base text-left">
+                Upload Image
+              </TypographyH3>
+              <TypographyP className="text-left">
+                Take a photo or choose an image from your device
+              </TypographyP>
+            </div>
           </div>
-          <div className="flex flex-col items-center justify-center pt-2 pb-4">
-            <TypographyH3 className="text-muted-foreground">
-              Upload Image
-            </TypographyH3>
-            <TypographyP className="max-w-[70%] text-center">
-              Take a photo or choose an image from your device
-            </TypographyP>
-          </div>
-        </div>
-
-        <input type="file" onChange={handleUpload} className="hidden" />
-
-        <div className="w-full  grid grid-cols-2 gap-4 justify-start items-start p-8">
+          <input type="file" onChange={handleUpload} className="hidden" />
+        </label>
+        <div className="w-full justify-start items-start">
           {images.map((img) => {
             const isLoaded = loaded[img]
             return (
               <div key={img} className="relative w-full">
-                {!isLoaded && (
-                  <div className="absolute inset-0 animate-pulse rounded-lg border border-border ring-4 ring-white shadow-sm shadow-black/10 overflow-hidden">
-                    <div className="w-full h-full bg-muted" />
-                  </div>
-                )}
-
                 <img
                   src={img}
                   loading="lazy"
@@ -100,7 +94,7 @@ export const UploadImage = (note: UploadImageProps) => {
             )
           })}
         </div>
-      </label>
+      </div>
     </div>
   )
 }

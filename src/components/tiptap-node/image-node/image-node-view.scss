@@ -1,0 +1,89 @@
+:root {
+  --tiptap-image-handle-bg: var(--tt-brand-color-600);
+}
+
+.dark {
+  --tiptap-image-handle-bg: var(--tt-brand-color-400);
+}
+
+.tiptap.ProseMirror {
+  .ProseMirror-selectednode .tiptap-image .tiptap-image-container {
+    outline: 0.125rem solid transparent;
+    outline-color: var(--tt-brand-color-500);
+    border-radius: 16px;
+  }
+
+  .tiptap-image {
+    display: flex;
+    width: 100%;
+    /* Remove extra vertical spacing around image wrapper */
+    margin: 0;
+
+    &[data-align="right"] {
+      text-align: right;
+      justify-content: flex-end;
+    }
+
+    &[data-align="center"] {
+      text-align: center;
+      justify-content: center;
+    }
+  }
+
+  .tiptap-image-container {
+    cursor: pointer;
+    user-select: none;
+    flex-direction: column;
+    display: flex;
+    /* Remove inline-image baseline spacing and keep box tight */
+    line-height: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tiptap-image-content {
+    align-items: center;
+    max-width: 100%;
+    display: flex;
+    position: relative;
+    /* Tight border hugging the image without overflow */
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 0;
+    line-height: 0;
+    min-height: auto;
+    height: auto;
+  }
+
+  .tiptap-image-img {
+    width: 100%;
+    border-radius: 16px;
+    display: block;
+    height: auto;
+    /* Override global img margins/shadows inside editor */
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .tiptap-image-handle {
+    position: absolute;
+    top: 50%;
+    width: 0.375rem;
+    height: 3rem;
+    background-color: var(--tiptap-image-handle-bg);
+    border-radius: 1.875rem;
+    cursor: ew-resize;
+    transform: translateY(-50%);
+    z-index: 10;
+
+    &.tiptap-image-handle-left {
+      left: 4px;
+    }
+
+    &.tiptap-image-handle-right {
+      right: 4px;
+    }
+  }
+}

@@ -64,7 +64,7 @@ export const NoteCard = (note: Note) => {
               ))}
             </div>
           )}
-          <TypographyH4 className="text-xl font-bold line-clamp-2">
+          <TypographyH4 className="text-xl font-bold line-clamp-2 font-sans">
             {note.title}
           </TypographyH4>
           <div className="w-full max-h-[310px] overflow-hidden">
@@ -75,8 +75,8 @@ export const NoteCard = (note: Note) => {
             </TypographyP>
           </div>
 
-          <div className="mt-1 flex items-center justify-between w-full">
-            <TypographyMuted className="font-semibold">
+          <div className="flex items-center justify-between w-full">
+            <TypographyMuted className="font-semibold font-sans">
               {format(note.updatedAt, "PP")}
             </TypographyMuted>
 

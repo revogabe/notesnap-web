@@ -1,0 +1,39 @@
+.tiptap.ProseMirror {
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  > img:not([data-type="emoji"] img) {
+    margin: 0;
+    outline: 0.125rem solid transparent;
+    border-radius: var(--tt-radius-xs, 0.5rem);
+    display: block;
+  }
+
+  img:not([data-type="emoji"] img).ProseMirror-selectednode {
+    outline-color: var(--tt-brand-color-500);
+  }
+
+  .tiptap-thread:has(> img) {
+    margin: 0;
+
+    img {
+      outline: 0.125rem solid transparent;
+      border-radius: var(--tt-radius-xs, 0.5rem);
+    }
+  }
+
+  .tiptap-thread img {
+    margin: 0;
+    display: block;
+  }
+
+  /* give image nodes breathing room */
+  .tiptap-image {
+    margin-top: 0.75rem;
+  }
+}
