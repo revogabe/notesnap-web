@@ -20,14 +20,8 @@ import { AtSignIcon } from "@/components/tiptap-icons/at-sign-icon"
 import { SmilePlusIcon } from "@/components/tiptap-icons/smile-plus-icon"
 
 // --- Lib ---
-import {
-  isExtensionAvailable,
-  isNodeInSchema,
-} from "@/lib/tiptap-utils"
-import {
-  findSelectionPosition,
-  hasContentAbove,
-} from "@/lib/tiptap-advanced-utils"
+import { isExtensionAvailable, isNodeInSchema } from "@/lib/tiptap-utils"
+import { findSelectionPosition } from "@/lib/tiptap-advanced-utils"
 
 // --- Tiptap UI ---
 import type { SuggestionItem } from "@/components/tiptap-ui-utils/suggestion-menu"
@@ -172,65 +166,12 @@ const getItemImplementations = () => {
   return {
     // AI
     continue_writing: {
-      check: (editor: Editor) => {
-        const { hasContent } = hasContentAbove(editor)
-        const extensionsReady = isExtensionAvailable(editor, [
-          "ai",
-          "aiAdvanced",
-        ])
-        return extensionsReady && hasContent
-      },
-      action: ({ editor }: { editor: Editor }) => {
-        const editorChain = editor.chain().focus()
-
-        const nodeSelectionPosition = findSelectionPosition({ editor })
-
-        if (nodeSelectionPosition !== null) {
-          editorChain.setNodeSelection(nodeSelectionPosition)
-        }
-
-        editorChain.run()
-
-        editor.chain().focus().aiGenerationShow().run()
-
-        requestAnimationFrame(() => {
-          const { hasContent, content } = hasContentAbove(editor)
-
-          const snippet =
-            content.length > 500 ? `...${content.slice(-500)}` : content
-
-          const prompt = hasContent
-            ? `Context: ${snippet}\n\nContinue writing from where the text above ends. Write ONLY ONE SENTENCE. DONT REPEAT THE TEXT.`
-            : "Start writing a new paragraph. Write ONLY ONE SENTENCE."
-
-          editor
-            .chain()
-            .focus()
-            .aiTextPrompt({
-              stream: true,
-              format: "rich-text",
-              text: prompt,
-            })
-            .run()
-        })
-      },
+      check: () => {},
+      action: () => {},
     },
     ai_ask_button: {
-      check: (editor: Editor) =>
-        isExtensionAvailable(editor, ["ai", "aiAdvanced"]),
-      action: ({ editor }: { editor: Editor }) => {
-        const editorChain = editor.chain().focus()
-
-        const nodeSelectionPosition = findSelectionPosition({ editor })
-
-        if (nodeSelectionPosition !== null) {
-          editorChain.setNodeSelection(nodeSelectionPosition)
-        }
-
-        editorChain.run()
-
-        editor.chain().focus().aiGenerationShow().run()
-      },
+      check: () => {},
+      action: () => {},
     },
 
     // Style

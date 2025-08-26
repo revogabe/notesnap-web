@@ -21,7 +21,10 @@ import {
   MenuGroupLabel,
   MenuButton,
 } from "@/components/tiptap-ui-primitive/menu"
-import { Combobox, ComboboxList } from "@/components/tiptap-ui-primitive/combobox"
+import {
+  Combobox,
+  ComboboxList,
+} from "@/components/tiptap-ui-primitive/combobox"
 import { Separator } from "@/components/tiptap-ui-primitive/separator"
 
 // Tiptap UI
@@ -52,10 +55,6 @@ import {
   HIGHLIGHT_COLORS,
   useColorHighlight,
 } from "@/components/tiptap-ui/color-highlight-button"
-import {
-  AskAiShortcutBadge,
-  useAiAsk,
-} from "@/components/tiptap-ui/ai-ask-button"
 import { useText } from "@/components/tiptap-ui/text-button"
 import { useHeading } from "@/components/tiptap-ui/heading-button"
 import { useList } from "@/components/tiptap-ui/list-button"
@@ -402,29 +401,6 @@ const CoreActionGroup: React.FC = () => {
   )
 }
 
-const AIActionGroup: React.FC = () => {
-  const { handleAiAsk, canAiAsk, Icon: AiAskIcon } = useAiAsk()
-
-  if (!canAiAsk) return null
-
-  return (
-    <>
-      <MenuGroup>
-        {canAiAsk && (
-          <BaseMenuItem
-            icon={AiAskIcon}
-            label="Ask AI"
-            onClick={handleAiAsk}
-            shortcutBadge={<AskAiShortcutBadge />}
-          />
-        )}
-      </MenuGroup>
-
-      <Separator orientation="horizontal" />
-    </>
-  )
-}
-
 const DeleteActionGroup: React.FC = () => {
   const { handleDeleteNode, canDeleteNode, label, Icon } = useDeleteNode()
 
@@ -585,8 +561,6 @@ export const DragContextMenu: React.FC<DragContextMenuProps> = ({
               {hasAnyActionGroups && <Separator orientation="horizontal" />}
 
               <CoreActionGroup />
-
-              <AIActionGroup />
 
               <DeleteActionGroup />
             </ComboboxList>

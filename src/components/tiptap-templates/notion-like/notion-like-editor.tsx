@@ -2,26 +2,20 @@
 
 import * as React from "react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
-import type { Doc as YDoc } from "yjs"
-import type { TiptapCollabProvider } from "@tiptap-pro/provider"
 import { createPortal } from "react-dom"
 
 // --- Tiptap Core Extensions ---
 import StarterKit from "@tiptap/starter-kit"
-import { Mention } from "@tiptap/extension-mention"
 import { TaskList, TaskItem } from "@tiptap/extension-list"
 import Color from "@tiptap/extension-color"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Placeholder, Selection, Dropcursor } from "@tiptap/extensions"
-import { Collaboration, isChangeOrigin } from "@tiptap/extension-collaboration"
-import { CollaborationCaret } from "@tiptap/extension-collaboration-caret"
 import { Typography } from "@tiptap/extension-typography"
 import { Highlight } from "@tiptap/extension-highlight"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Subscript } from "@tiptap/extension-subscript"
 import TextAlign from "@tiptap/extension-text-align"
 import Mathematics from "@tiptap/extension-mathematics"
-import Ai from "@tiptap-pro/extension-ai"
 import UniqueID from "@tiptap/extension-unique-id"
 import Emoji, { gitHubEmojis } from "@tiptap/extension-emoji"
 
@@ -201,7 +195,6 @@ export function EditorProvider(props: EditorProviderProps) {
           "blockquote",
           "codeBlock",
         ],
-        filterTransaction: (transaction) => !isChangeOrigin(transaction),
       }),
       Typography,
       UiState,
