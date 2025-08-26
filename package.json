@@ -53,6 +53,7 @@
     "@tiptap/extension-typography": "^3.3.0",
     "@tiptap/extension-unique-id": "^3.3.0",
     "@tiptap/extensions": "^3.3.0",
+    "@tiptap/pm": "^3.3.0",
     "@tiptap/react": "^3.3.0",
     "@tiptap/starter-kit": "^3.3.0",
     "@tiptap/suggestion": "^3.3.0",
