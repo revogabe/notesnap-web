@@ -32,7 +32,6 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/react-visually-hidden": "^1.2.3",
     "@supabase/supabase-js": "^2.55.0",
-    "@tiptap-pro/extension-comments": "^3.2.0",
     "@tiptap/core": "^3.3.0",
     "@tiptap/extension-color": "^3.3.0",
     "@tiptap/extension-document": "^3.3.0",
