@@ -71,9 +71,6 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.55.0
         version: 2.55.0
-      '@tiptap-pro/extension-comments':
-        specifier: ^3.2.0
-        version: 3.2.0(@hocuspocus/provider@3.2.3(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@hocuspocus/transformer@3.2.3(@tiptap/core@3.3.0(@tiptap/pm@3.3.0))(@tiptap/pm@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-view@1.40.1)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(yjs@13.6.27))(@tiptap-pro/provider@3.2.0(@hocuspocus/provider@3.2.3(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(lib0@0.2.114)(yjs@13.6.27))(@tiptap/core@3.3.0(@tiptap/pm@3.3.0))(@tiptap/pm@3.3.0)
       '@tiptap/core':
         specifier: 3.3.0
         version: 3.3.0(@tiptap/pm@3.3.0)
@@ -605,23 +602,6 @@ packages:
   '@hexagon/base64@1.1.28':
     resolution: {integrity: sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==}
 
-  '@hocuspocus/common@3.2.3':
-    resolution: {integrity: sha512-P8COsx2HVXS7NbDEKe9KSt5Hd1A95hZhyTabiNPlU/Pi+7K1RJuHqIkIRr4oIxGzujvpLq/LSwBHP4NYUk+cGA==}
-
-  '@hocuspocus/provider@3.2.3':
-    resolution: {integrity: sha512-M62Fly7s6sKKGGFze46fypjV3jv2Y2l8PA6/+IgbQRWH275p8NjGP1U7yMOxi52PLFrgaEoy+fQyW93iJ2jqaw==}
-    peerDependencies:
-      y-protocols: ^1.0.6
-      yjs: ^13.6.8
-
-  '@hocuspocus/transformer@3.2.3':
-    resolution: {integrity: sha512-gpClIVctiTvad7Q/ON9uFShpgm2BLlx09SGSlmyu1ddMA6Vbky9YD1lSq+ioj17z0TYaehyF7w6bBxmooAzUfA==}
-    peerDependencies:
-      '@tiptap/core': 3.3.0
-      '@tiptap/pm': 3.3.0
-      y-prosemirror: ^1.2.1
-      yjs: ^13.6.8
-
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
     engines: {node: '>=18.18.0'}
@@ -786,9 +766,6 @@ packages:
 
   '@levischuck/tiny-cbor@0.2.11':
     resolution: {integrity: sha512-llBRm4dT4Z89aRsm6u2oEZ8tfwL/2l6BwpZ7JcyieouniDECM5AqNgr/y08zalEIvW3RSK4upYyybDcmjXqAow==}
-
-  '@lifeomic/attempt@3.1.0':
-    resolution: {integrity: sha512-QZqem4QuAnAyzfz+Gj5/+SLxqwCAw2qmt7732ZXodr6VDWGeYLG6w1i/vYLa55JQM9wRuBKLmXmiZ2P0LtE5rw==}
 
   '@mongodb-js/saslprep@1.3.0':
     resolution: {integrity: sha512-zlayKCsIjYb7/IdfqxorK5+xUMyi4vOKcFy10wKJYc63NSdKI8mNME+uJqfatkPmOSMMUiojrL58IePKBm3gvQ==}
@@ -1648,22 +1625,6 @@ packages:
     engines: {node: '>=12', npm: '>=6'}
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
-
-  '@tiptap-pro/extension-comments@3.2.0':
-    resolution: {integrity: sha512-LdJSwmh9F2C+NKN0ELdXk9RaMq8DVSSNy65cRHsPvJ4/Xykk/r6jy+lUsWEs4fIOG+I3gfXzkYBmHKotaDTdTQ==}
-    peerDependencies:
-      '@hocuspocus/provider': ^3.2.0
-      '@hocuspocus/transformer': ^3.2.0
-      '@tiptap-pro/provider': 3.2.0
-      '@tiptap/core': 3.3.0
-      '@tiptap/pm': 3.3.0
-
-  '@tiptap-pro/provider@3.2.0':
-    resolution: {integrity: sha512-ozTDX7J7pIOAC2VMqq8en5g+GZnHG/rG4CDWFbYVmBJW+1ekhXjKFcmG+bXbuu2WUnbleNtAOx2mrSnB1XAzSw==}
-    peerDependencies:
-      '@hocuspocus/provider': ^3.2.0
-      lib0: ^0.2.99
-      yjs: ^13.6.20
 
   '@tiptap/core@3.3.0':
     resolution: {integrity: sha512-YAmFITHzgp/hafA7Ety1qMo4Tl5e5b2+06LaiB9k3rAI7gfO6AXCwhXUqm3fCScmBfMMvMycq9IOIiHk946IzA==}
@@ -4196,16 +4157,6 @@ packages:
   xmlchars@2.2.0:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
 
-  y-prosemirror@1.3.7:
-    resolution: {integrity: sha512-NpM99WSdD4Fx4if5xOMDpPtU3oAmTSjlzh5U4353ABbRHl1HtAFUx6HlebLZfyFxXN9jzKMDkVbcRjqOZVkYQg==}
-    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
-    peerDependencies:
-      prosemirror-model: ^1.7.1
-      prosemirror-state: ^1.2.3
-      prosemirror-view: ^1.9.10
-      y-protocols: ^1.0.1
-      yjs: ^13.5.38
-
   y-protocols@1.0.6:
     resolution: {integrity: sha512-vHRF2L6iT3rwj1jub/K5tYcTT/mEYDUppgNPXwp8fmLpui9f7Yeq3OEtTLVF012j39QnV+KEQpNqoN7CWU7Y9Q==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
@@ -4510,30 +4461,6 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hocuspocus/common@3.2.3':
-    dependencies:
-      lib0: 0.2.114
-
-  '@hocuspocus/provider@3.2.3(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
-    dependencies:
-      '@hocuspocus/common': 3.2.3
-      '@lifeomic/attempt': 3.1.0
-      lib0: 0.2.114
-      ws: 8.18.3
-      y-protocols: 1.0.6(yjs@13.6.27)
-      yjs: 13.6.27
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
-  '@hocuspocus/transformer@3.2.3(@tiptap/core@3.3.0(@tiptap/pm@3.3.0))(@tiptap/pm@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-view@1.40.1)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(yjs@13.6.27)':
-    dependencies:
-      '@tiptap/core': 3.3.0(@tiptap/pm@3.3.0)
-      '@tiptap/pm': 3.3.0
-      '@tiptap/starter-kit': 3.3.0
-      y-prosemirror: 1.3.7(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-view@1.40.1)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
-      yjs: 13.6.27
-
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.6':
@@ -4657,8 +4584,6 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   '@levischuck/tiny-cbor@0.2.11': {}
-
-  '@lifeomic/attempt@3.1.0': {}
 
   '@mongodb-js/saslprep@1.3.0':
     dependencies:
@@ -5468,20 +5393,6 @@ snapshots:
   '@testing-library/user-event@14.6.1(@testing-library/dom@10.4.1)':
     dependencies:
       '@testing-library/dom': 10.4.1
-
-  '@tiptap-pro/extension-comments@3.2.0(@hocuspocus/provider@3.2.3(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@hocuspocus/transformer@3.2.3(@tiptap/core@3.3.0(@tiptap/pm@3.3.0))(@tiptap/pm@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-view@1.40.1)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(yjs@13.6.27))(@tiptap-pro/provider@3.2.0(@hocuspocus/provider@3.2.3(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(lib0@0.2.114)(yjs@13.6.27))(@tiptap/core@3.3.0(@tiptap/pm@3.3.0))(@tiptap/pm@3.3.0)':
-    dependencies:
-      '@hocuspocus/provider': 3.2.3(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
-      '@hocuspocus/transformer': 3.2.3(@tiptap/core@3.3.0(@tiptap/pm@3.3.0))(@tiptap/pm@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-view@1.40.1)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(yjs@13.6.27)
-      '@tiptap-pro/provider': 3.2.0(@hocuspocus/provider@3.2.3(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(lib0@0.2.114)(yjs@13.6.27)
-      '@tiptap/core': 3.3.0(@tiptap/pm@3.3.0)
-      '@tiptap/pm': 3.3.0
-
-  '@tiptap-pro/provider@3.2.0(@hocuspocus/provider@3.2.3(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(lib0@0.2.114)(yjs@13.6.27)':
-    dependencies:
-      '@hocuspocus/provider': 3.2.3(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
-      lib0: 0.2.114
-      yjs: 13.6.27
 
   '@tiptap/core@3.3.0(@tiptap/pm@3.3.0)':
     dependencies:
@@ -8327,15 +8238,6 @@ snapshots:
   xml-name-validator@5.0.0: {}
 
   xmlchars@2.2.0: {}
-
-  y-prosemirror@1.3.7(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-view@1.40.1)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27):
-    dependencies:
-      lib0: 0.2.114
-      prosemirror-model: 1.25.3
-      prosemirror-state: 1.4.3
-      prosemirror-view: 1.40.1
-      y-protocols: 1.0.6(yjs@13.6.27)
-      yjs: 13.6.27
 
   y-protocols@1.0.6(yjs@13.6.27):
     dependencies:
